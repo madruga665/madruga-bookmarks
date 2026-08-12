@@ -1,0 +1,23 @@
+# Android & Gradle
+build/
+.gradle/
+app/build/
+*.apk
+*.aab
+*.aar
+
+# IDE & Editor files
+.idea/
+*.iml
+.navigation/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs & Environment
+*.log
+.env*

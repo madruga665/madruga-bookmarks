@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BookmarkQuickSaveAPI",
+  "description": "API payload contracts for quick saving bookmarks and listing collections on home screen",
+  "endpoints": {
+    "POST /api/v1/bookmarks/quick-save": {
+      "summary": "Quick save a bookmark link from home screen",
+      "requestBody": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://android.com"
+          },
+          "collection_id": {
+            "type": "string",
+            "nullable": true,
+            "example": "col_123"
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Bookmark saved successfully",
+          "body": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "url": { "type": "string" },
+              "title": { "type": "string", "nullable": true },
+              "favicon_url": { "type": "string", "nullable": true },
+              "collection_id": { "type": "string", "nullable": true },
+              "created_at": { "type": "integer" }
+            }
+          }
+        },
+        "400": {
+          "description": "Invalid URL format"
+        }
+      }
+    },
+    "GET /api/v1/collections": {
+      "summary": "Fetch user collections for home screen grid",
+      "responses": {
+        "200": {
+          "body": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "name": { "type": "string" },
+                "link_count": { "type": "integer" },
+                "icon_key": { "type": "string" },
+                "color_accent": { "type": "string", "enum": ["YELLOW", "PURPLE", "ORANGE", "BLUE", "GREEN"] }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
