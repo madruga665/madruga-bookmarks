@@ -19,9 +19,10 @@ class CollectionRepositoryTest {
         val repository = CollectionRepository(collectionDao)
 
         val result = repository.collections.first()
-        assertEquals(3, result.size)
-        assertEquals("IA", result[0].name)
-        assertEquals("Vagas", result[1].name)
-        assertEquals("Programação", result[2].name)
+        assertEquals(4, result.size)
+        assertEquals("Unsorted", result[0].name)
+        assertEquals("IA", result[1].name)
+        assertEquals("Vagas", result[2].name)
+        assertEquals("Programação", result[3].name)
     }
 }

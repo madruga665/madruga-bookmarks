@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.madruga665.bookmarks.ui.home.HomeScreen
 import com.madruga665.bookmarks.ui.home.HomeViewModel
+import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkViewModel
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 
 object NavRoutes {
@@ -30,6 +31,7 @@ object NavRoutes {
 @Composable
 fun BookmarksNavGraph(
     homeViewModel: HomeViewModel,
+    saveBookmarkViewModel: SaveBookmarkViewModel,
     navController: NavHostController = rememberNavController()
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
@@ -41,9 +43,9 @@ fun BookmarksNavGraph(
         composable(NavRoutes.HOME) {
             HomeScreen(
                 uiState = uiState,
+                saveBookmarkViewModel = saveBookmarkViewModel,
                 onUrlInputChange = homeViewModel::onUrlInputChange,
                 onPasteFromClipboard = homeViewModel::onPasteFromClipboard,
-                onQuickSaveSubmit = homeViewModel::onQuickSaveSubmit,
                 onCollectionClick = { collectionId ->
                     navController.navigate(NavRoutes.folderDetail(collectionId))
                 },

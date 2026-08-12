@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BookmarkSaveModalAPI",
+  "description": "API schema for bookmark creation with folder assignment and pin status",
+  "endpoints": {
+    "POST /api/v1/bookmarks": {
+      "summary": "Save a bookmark with folder selection and pin status",
+      "requestBody": {
+        "type": "object",
+        "required": ["url", "collection_id"],
+        "properties": {
+          "url": { "type": "string", "format": "uri" },
+          "collection_id": { "type": "string", "default": "col_unsorted" },
+          "is_pinned": { "type": "boolean", "default": false }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Bookmark created successfully",
+          "body": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "url": { "type": "string" },
+              "collection_id": { "type": "string" },
+              "is_pinned": { "type": "boolean" },
+              "created_at": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "POST /api/v1/collections": {
+      "summary": "Create a new folder collection",
+      "requestBody": {
+        "type": "object",
+        "required": ["name", "color_accent"],
+        "properties": {
+          "name": { "type": "string", "maxLength": 50 },
+          "color_accent": { "type": "string", "enum": ["YELLOW", "PURPLE", "ORANGE", "BLUE", "GREEN"] }
+        }
+      },
+      "responses": {
+        "201": {
+          "body": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "color_accent": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

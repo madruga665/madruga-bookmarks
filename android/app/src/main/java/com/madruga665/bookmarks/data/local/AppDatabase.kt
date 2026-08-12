@@ -14,6 +14,9 @@ interface CollectionDao {
     fun getAllCollections(): Flow<List<CollectionEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCollection(collection: CollectionEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCollections(collections: List<CollectionEntity>)
 
     @Query("UPDATE collections_table SET link_count = link_count + 1 WHERE id = :collectionId")
@@ -29,7 +32,7 @@ interface BookmarkDao {
     suspend fun insertBookmark(bookmark: BookmarkEntity)
 }
 
-@Database(entities = [CollectionEntity::class, BookmarkEntity::class], version = 1, exportSchema = false)
+@Database(entities = [CollectionEntity::class, BookmarkEntity::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun collectionDao(): CollectionDao
     abstract fun bookmarkDao(): BookmarkDao

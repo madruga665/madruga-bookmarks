@@ -21,7 +21,8 @@ data class BookmarkEntity(
     @ColumnInfo(name = "url") val url: String,
     @ColumnInfo(name = "title") val title: String?,
     @ColumnInfo(name = "favicon_url") val faviconUrl: String?,
-    @ColumnInfo(name = "collection_id") val collectionId: String?,
+    @ColumnInfo(name = "collection_id") val collectionId: String = "col_unsorted",
+    @ColumnInfo(name = "is_pinned") val isPinned: Boolean = false,
     @ColumnInfo(name = "created_at") val createdAt: Long,
     @ColumnInfo(name = "sync_status") val syncStatus: String = "PENDING_SYNC"
 )

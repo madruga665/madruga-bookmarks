@@ -10,7 +10,11 @@ class BookmarkRepository(
 ) {
     val allBookmarks: Flow<List<BookmarkEntity>> = bookmarkDao.getAllBookmarks()
 
-    suspend fun quickSaveBookmark(url: String, collectionId: String? = null): Boolean {
+    suspend fun quickSaveBookmark(
+        url: String,
+        collectionId: String = "col_unsorted",
+        isPinned: Boolean = false
+    ): Boolean {
         if (url.isBlank() || (!url.startsWith("http://") && !url.startsWith("https://"))) {
             return false
         }
@@ -19,7 +23,8 @@ class BookmarkRepository(
             url = url.trim(),
             title = null,
             faviconUrl = null,
-            collectionId = collectionId,
+            collectionId = if (collectionId.isBlank()) "col_unsorted" else collectionId,
+            isPinned = isPinned,
             createdAt = System.currentTimeMillis(),
             syncStatus = "PENDING_SYNC"
         )

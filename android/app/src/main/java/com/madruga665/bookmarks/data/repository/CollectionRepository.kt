@@ -4,6 +4,7 @@ import com.madruga665.bookmarks.data.local.CollectionDao
 import com.madruga665.bookmarks.data.local.CollectionEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.UUID
 
 class CollectionRepository(
     private val collectionDao: CollectionDao
@@ -16,7 +17,31 @@ class CollectionRepository(
         }
     }
 
+    suspend fun createCollection(name: String, colorAccent: String): CollectionEntity? {
+        if (name.isBlank()) return null
+        val entity = CollectionEntity(
+            id = UUID.randomUUID().toString(),
+            name = name.trim(),
+            linkCount = 0,
+            iconKey = "folder",
+            colorAccent = colorAccent.uppercase(),
+            createdAt = System.currentTimeMillis(),
+            updatedAt = System.currentTimeMillis()
+        )
+        collectionDao.insertCollection(entity)
+        return entity
+    }
+
     private fun defaultCollections(): List<CollectionEntity> = listOf(
+        CollectionEntity(
+            id = "col_unsorted",
+            name = "Unsorted",
+            linkCount = 0,
+            iconKey = "folder",
+            colorAccent = "YELLOW",
+            createdAt = System.currentTimeMillis(),
+            updatedAt = System.currentTimeMillis()
+        ),
         CollectionEntity(
             id = "col_ia",
             name = "IA",
