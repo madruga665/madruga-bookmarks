@@ -1,20 +1,44 @@
 package com.madruga665.bookmarks.data.repository
 
+import com.madruga665.bookmarks.data.local.BookmarkDao
 import com.madruga665.bookmarks.data.local.CollectionDao
 import com.madruga665.bookmarks.data.local.CollectionEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 
 class CollectionRepository(
-    private val collectionDao: CollectionDao
+    private val collectionDao: CollectionDao,
+    private val bookmarkDao: BookmarkDao
 ) {
-    val collections: Flow<List<CollectionEntity>> = collectionDao.getAllCollections().map { list ->
-        if (list.isEmpty()) {
-            defaultCollections()
+    private var isSeeded = false
+
+    val collections: Flow<List<CollectionEntity>> = combine(
+        collectionDao.getAllCollections(),
+        bookmarkDao.getAllBookmarks()
+    ) { dbCollections, bookmarks ->
+        if (dbCollections.isEmpty() && !isSeeded) {
+            isSeeded = true
+            collectionDao.insertCollections(defaultCollections())
+            defaultCollections().map { collection ->
+                val actualCount = bookmarks.count { it.collectionId == collection.id }
+                collection.copy(linkCount = actualCount)
+            }
         } else {
-            list
+            isSeeded = true
+            dbCollections.map { collection ->
+                val actualCount = bookmarks.count { it.collectionId == collection.id }
+                collection.copy(linkCount = actualCount)
+            }
         }
+    }
+
+    fun getCollectionById(collectionId: String): Flow<CollectionEntity?> = combine(
+        collectionDao.getCollectionById(collectionId),
+        bookmarkDao.getBookmarksByCollection(collectionId)
+    ) { collection, bookmarks ->
+        collection?.copy(linkCount = bookmarks.size)
     }
 
     suspend fun createCollection(name: String, colorAccent: String): CollectionEntity? {
@@ -23,6 +47,8 @@ class CollectionRepository(
             id = UUID.randomUUID().toString(),
             name = name.trim(),
             linkCount = 0,
+            subcollectionCount = 0,
+            parentId = null,
             iconKey = "folder",
             colorAccent = colorAccent.uppercase(),
             createdAt = System.currentTimeMillis(),
@@ -32,40 +58,31 @@ class CollectionRepository(
         return entity
     }
 
+    suspend fun updateCollection(id: String, name: String, colorAccent: String, iconKey: String) {
+        if (name.isBlank()) return
+        collectionDao.updateCollection(
+            id = id,
+            name = name.trim(),
+            colorAccent = colorAccent.uppercase(),
+            iconKey = iconKey.lowercase(),
+            updatedAt = System.currentTimeMillis()
+        )
+    }
+
+    suspend fun deleteCollection(collectionId: String) {
+        bookmarkDao.deleteBookmarksByCollectionId(collectionId)
+        collectionDao.deleteCollectionById(collectionId)
+    }
+
     private fun defaultCollections(): List<CollectionEntity> = listOf(
         CollectionEntity(
             id = "col_unsorted",
             name = "Unsorted",
             linkCount = 0,
+            subcollectionCount = 0,
+            parentId = null,
             iconKey = "folder",
             colorAccent = "YELLOW",
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
-        ),
-        CollectionEntity(
-            id = "col_ia",
-            name = "IA",
-            linkCount = 2,
-            iconKey = "code",
-            colorAccent = "YELLOW",
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
-        ),
-        CollectionEntity(
-            id = "col_vagas",
-            name = "Vagas",
-            linkCount = 2,
-            iconKey = "work",
-            colorAccent = "PURPLE",
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
-        ),
-        CollectionEntity(
-            id = "col_programacao",
-            name = "Programação",
-            linkCount = 0,
-            iconKey = "code",
-            colorAccent = "ORANGE",
             createdAt = System.currentTimeMillis(),
             updatedAt = System.currentTimeMillis()
         )

@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.madruga665.bookmarks.data.local.CollectionEntity
+import com.madruga665.bookmarks.ui.components.CollectionOption
 import com.madruga665.bookmarks.ui.components.NeobrutalistFolderCard
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 
@@ -21,6 +25,13 @@ import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 fun MyCollectionsGrid(
     collections: List<CollectionEntity>,
     onCollectionClick: (String) -> Unit,
+    activeMenuCollection: CollectionEntity? = null,
+    touchPositionInWindow: Offset? = null,
+    onHoveredOptionChange: (CollectionOption?) -> Unit = {},
+    onCollectionLongClick: ((CollectionEntity) -> Unit)? = null,
+    onLongPressStart: ((CollectionEntity, Offset, Offset, IntSize) -> Unit)? = null,
+    onLongPressDrag: ((Offset) -> Unit)? = null,
+    onLongPressRelease: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -49,10 +60,24 @@ fun MyCollectionsGrid(
                 horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 rowItems.forEach { collection ->
+                    val isActive = activeMenuCollection?.id == collection.id
                     NeobrutalistFolderCard(
                         collection = collection,
                         onClick = { onCollectionClick(collection.id) },
-                        modifier = Modifier.weight(1f)
+                        onLongClick = if (onCollectionLongClick != null) {
+                            { onCollectionLongClick(collection) }
+                        } else null,
+                        isActiveMenu = isActive,
+                        touchPositionInWindow = if (isActive) touchPositionInWindow else null,
+                        onHoveredOptionChange = if (isActive) onHoveredOptionChange else { _ -> },
+                        onLongPressStart = onLongPressStart,
+                        onLongPressDrag = onLongPressDrag,
+                        onLongPressRelease = onLongPressRelease,
+                        modifier = Modifier
+                            .weight(1f)
+                            .graphicsLayer {
+                                alpha = if (isActive) 0f else 1f
+                            }
                     )
                 }
                 if (rowItems.size == 1) {

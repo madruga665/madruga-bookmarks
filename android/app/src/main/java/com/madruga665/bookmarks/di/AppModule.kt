@@ -26,7 +26,8 @@ object AppModule {
             context,
             AppDatabase::class.java,
             "bookmarks_db"
-        ).fallbackToDestructiveMigration().build()
+        ).fallbackToDestructiveMigration(dropAllTables = true).build()
+
     }
 
     @Provides
@@ -37,8 +38,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCollectionRepository(collectionDao: CollectionDao): CollectionRepository {
-        return CollectionRepository(collectionDao)
+    fun provideCollectionRepository(
+        collectionDao: CollectionDao,
+        bookmarkDao: BookmarkDao
+    ): CollectionRepository {
+        return CollectionRepository(collectionDao, bookmarkDao)
     }
 
     @Provides

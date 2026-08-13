@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CollectionDetailsNavigationContract",
+  "description": "Navigation and UI state contract for the Collection Bookmarks List View",
+  "type": "object",
+  "properties": {
+    "route": {
+      "type": "string",
+      "example": "folder_detail/{folderId}"
+    },
+    "navigationParameters": {
+      "type": "object",
+      "properties": {
+        "folderId": {
+          "type": "string",
+          "description": "Identifier of the target collection folder to view"
+        }
+      },
+      "required": ["folderId"]
+    },
+    "uiState": {
+      "type": "object",
+      "properties": {
+        "collectionTitle": { "type": "string", "example": "Vagas" },
+        "linkCount": { "type": "integer", "minimum": 0, "example": 2 },
+        "subcollectionCount": { "type": "integer", "minimum": 0, "example": 0 },
+        "subtitle": { "type": "string", "example": "2 links · 0 subcollections" },
+        "bookmarks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "url": { "type": "string" },
+              "title": { "type": "string" },
+              "sourcePlatform": { "type": "string", "example": "@LinkedIn" },
+              "isPinned": { "type": "boolean" }
+            },
+            "required": ["id", "url"]
+          }
+        }
+      },
+      "required": ["collectionTitle", "linkCount", "subcollectionCount", "bookmarks"]
+    }
+  }
+}

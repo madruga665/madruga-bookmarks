@@ -1,5 +1,8 @@
 package com.madruga665.bookmarks.ui.navigation
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,14 +10,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.madruga665.bookmarks.data.repository.BookmarkRepository
+import com.madruga665.bookmarks.data.repository.CollectionRepository
+import com.madruga665.bookmarks.ui.collection.CollectionDetailScreen
+import com.madruga665.bookmarks.ui.collection.CollectionDetailViewModel
 import com.madruga665.bookmarks.ui.home.HomeScreen
 import com.madruga665.bookmarks.ui.home.HomeViewModel
+import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkBottomSheet
 import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkViewModel
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 
@@ -32,6 +42,8 @@ object NavRoutes {
 fun BookmarksNavGraph(
     homeViewModel: HomeViewModel,
     saveBookmarkViewModel: SaveBookmarkViewModel,
+    collectionRepository: CollectionRepository,
+    bookmarkRepository: BookmarkRepository,
     navController: NavHostController = rememberNavController()
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
@@ -41,6 +53,7 @@ fun BookmarksNavGraph(
         startDestination = NavRoutes.HOME
     ) {
         composable(NavRoutes.HOME) {
+            val context = LocalContext.current
             HomeScreen(
                 uiState = uiState,
                 saveBookmarkViewModel = saveBookmarkViewModel,
@@ -49,6 +62,25 @@ fun BookmarksNavGraph(
                 onCollectionClick = { collectionId ->
                     navController.navigate(NavRoutes.folderDetail(collectionId))
                 },
+                onCollectionLongClick = homeViewModel::openActionsMenu,
+                onLongPressStart = homeViewModel::onLongPressStart,
+                onLongPressDrag = homeViewModel::onLongPressDrag,
+                onLongPressRelease = {
+                    homeViewModel.onLongPressRelease { collection ->
+                        homeViewModel.shareCollection(context, collection)
+                    }
+                },
+                onHoveredOptionChange = homeViewModel::onHoveredOptionChange,
+                onDismissActionsMenu = homeViewModel::dismissActionsMenu,
+                onEditCollectionClick = homeViewModel::openEditDialog,
+                onShareCollectionClick = { collection ->
+                    homeViewModel.shareCollection(context, collection)
+                },
+                onDeleteCollectionClick = homeViewModel::openDeleteDialog,
+                onDismissEditDialog = homeViewModel::dismissEditDialog,
+                onConfirmEditCollection = homeViewModel::updateCollection,
+                onDismissDeleteDialog = homeViewModel::dismissDeleteDialog,
+                onConfirmDeleteCollection = homeViewModel::deleteCollection,
                 onNavigateToSearch = {
                     navController.navigate(NavRoutes.SEARCH)
                 },
@@ -74,8 +106,58 @@ fun BookmarksNavGraph(
         }
 
         composable(NavRoutes.FOLDER_DETAIL) { backStackEntry ->
+            val context = LocalContext.current
             val folderId = backStackEntry.arguments?.getString("folderId") ?: ""
-            PlaceholderDestination(title = "Folder Detail: $folderId")
+            val viewModel = remember(folderId) {
+                CollectionDetailViewModel(
+                    collectionId = folderId,
+                    collectionRepository = collectionRepository,
+                    bookmarkRepository = bookmarkRepository
+                )
+            }
+            val detailUiState by viewModel.uiState.collectAsState()
+            val saveModalUiState by saveBookmarkViewModel.uiState.collectAsState()
+
+            CollectionDetailScreen(
+                uiState = detailUiState,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onAddLinkClick = {
+                    saveBookmarkViewModel.openSaveModal("https://")
+                    saveBookmarkViewModel.onSelectCollection(folderId)
+                },
+                onOptionsClick = {
+                    // Options click handler
+                },
+                onBookmarkClick = { bookmark ->
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(bookmark.url))
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Could not open URL: ${bookmark.url}", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                onSubcollectionClick = { subcollectionId ->
+                    navController.navigate(NavRoutes.folderDetail(subcollectionId))
+                }
+            )
+
+            SaveBookmarkBottomSheet(
+                uiState = saveModalUiState,
+                onCollectionSelect = saveBookmarkViewModel::onSelectCollection,
+                onTogglePin = saveBookmarkViewModel::onTogglePin,
+                onToggleCreateFolder = saveBookmarkViewModel::onToggleCreateFolder,
+                onNewFolderNameChange = saveBookmarkViewModel::onNewFolderNameChange,
+                onNewFolderColorSelect = saveBookmarkViewModel::onNewFolderColorSelect,
+                onCreateFolderSubmit = saveBookmarkViewModel::onCreateFolderSubmit,
+                onConfirmSave = {
+                    saveBookmarkViewModel.onConfirmSave {
+                        Toast.makeText(context, "Bookmark saved successfully!", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                onDismiss = saveBookmarkViewModel::dismissModal
+            )
         }
     }
 }
@@ -95,3 +177,4 @@ private fun PlaceholderDestination(title: String) {
         )
     }
 }
+

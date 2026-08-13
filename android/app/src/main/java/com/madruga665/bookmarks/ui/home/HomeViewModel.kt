@@ -29,12 +29,129 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             collectionRepository.collections.collectLatest { list ->
                 val current = _uiState.value
-                val input = if (current is HomeScreenUiState.Success) current.quickSaveUrlInput else ""
-                _uiState.value = HomeScreenUiState.Success(
-                    collections = list,
-                    quickSaveUrlInput = input
-                )
+                if (current is HomeScreenUiState.Success) {
+                    _uiState.value = current.copy(collections = list)
+                } else {
+                    _uiState.value = HomeScreenUiState.Success(collections = list)
+                }
             }
+        }
+    }
+
+    fun openActionsMenu(collection: com.madruga665.bookmarks.data.local.CollectionEntity) {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        _uiState.value = current.copy(activeMenuCollection = collection)
+    }
+
+    fun dismissActionsMenu() {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        _uiState.value = current.copy(
+            activeMenuCollection = null,
+            activeCardOffset = null,
+            activeCardSize = null,
+            touchPositionInWindow = null,
+            hoveredOption = null
+        )
+    }
+
+    fun onLongPressStart(
+        collection: com.madruga665.bookmarks.data.local.CollectionEntity,
+        touchInWindow: androidx.compose.ui.geometry.Offset,
+        cardOffset: androidx.compose.ui.geometry.Offset,
+        cardSize: androidx.compose.ui.unit.IntSize
+    ) {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        _uiState.value = current.copy(
+            activeMenuCollection = collection,
+            activeCardOffset = cardOffset,
+            activeCardSize = cardSize,
+            touchPositionInWindow = touchInWindow,
+            hoveredOption = null
+        )
+    }
+
+    fun onLongPressDrag(touchInWindow: androidx.compose.ui.geometry.Offset) {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        if (current.activeMenuCollection != null) {
+            _uiState.value = current.copy(touchPositionInWindow = touchInWindow)
+        }
+    }
+
+    fun onHoveredOptionChange(option: com.madruga665.bookmarks.ui.components.CollectionOption?) {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        if (current.hoveredOption != option) {
+            _uiState.value = current.copy(hoveredOption = option)
+        }
+    }
+
+    fun onLongPressRelease(onShareRequested: (com.madruga665.bookmarks.data.local.CollectionEntity) -> Unit) {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        val targetCollection = current.activeMenuCollection ?: return
+        val selectedOption = current.hoveredOption
+
+        _uiState.value = current.copy(
+            activeMenuCollection = null,
+            activeCardOffset = null,
+            activeCardSize = null,
+            touchPositionInWindow = null,
+            hoveredOption = null
+        )
+
+        when (selectedOption) {
+            com.madruga665.bookmarks.ui.components.CollectionOption.EDIT -> openEditDialog(targetCollection)
+            com.madruga665.bookmarks.ui.components.CollectionOption.SHARE -> onShareRequested(targetCollection)
+            com.madruga665.bookmarks.ui.components.CollectionOption.DELETE -> openDeleteDialog(targetCollection)
+            null -> { /* Simply close menu */ }
+        }
+    }
+
+    fun openEditDialog(collection: com.madruga665.bookmarks.data.local.CollectionEntity) {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        _uiState.value = current.copy(
+            activeMenuCollection = null,
+            collectionToEdit = collection
+        )
+    }
+
+    fun dismissEditDialog() {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        _uiState.value = current.copy(collectionToEdit = null)
+    }
+
+    fun updateCollection(id: String, name: String, colorAccent: String, iconKey: String) {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        viewModelScope.launch {
+            collectionRepository.updateCollection(id, name, colorAccent, iconKey)
+            _uiState.value = current.copy(collectionToEdit = null)
+        }
+    }
+
+    fun openDeleteDialog(collection: com.madruga665.bookmarks.data.local.CollectionEntity) {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        _uiState.value = current.copy(
+            activeMenuCollection = null,
+            collectionToDelete = collection
+        )
+    }
+
+    fun dismissDeleteDialog() {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        _uiState.value = current.copy(collectionToDelete = null)
+    }
+
+    fun deleteCollection(collectionId: String) {
+        val current = _uiState.value as? HomeScreenUiState.Success ?: return
+        viewModelScope.launch {
+            collectionRepository.deleteCollection(collectionId)
+            _uiState.value = current.copy(collectionToDelete = null)
+        }
+    }
+
+    fun shareCollection(context: android.content.Context, collection: com.madruga665.bookmarks.data.local.CollectionEntity) {
+        dismissActionsMenu()
+        viewModelScope.launch {
+            val bookmarks = bookmarkRepository.getBookmarksForCollection(collection.id)
+            com.madruga665.bookmarks.ui.utils.ShareUtils.shareCollection(context, collection, bookmarks)
         }
     }
 

@@ -22,6 +22,9 @@ import androidx.compose.ui.unit.dp
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 import com.madruga665.bookmarks.ui.theme.neobrutalistShadow
 
+import androidx.compose.material3.Text
+import androidx.compose.ui.text.font.FontWeight
+
 @Composable
 fun NeobrutalistButton(
     onClick: () -> Unit,
@@ -68,3 +71,37 @@ fun NeobrutalistButton(
         content = content
     )
 }
+
+@Composable
+fun NeobrutalistButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    containerColor: Color = NeobrutalismTheme.colors.surface,
+    contentColor: Color = if (containerColor == NeobrutalismTheme.colors.accentYellow) NeobrutalismTheme.colors.border else NeobrutalismTheme.colors.onSurface,
+    borderColor: Color = NeobrutalismTheme.colors.border,
+    shadowColor: Color = NeobrutalismTheme.colors.shadow,
+    shape: Shape = RoundedCornerShape(12.dp),
+    borderWidth: Dp = 2.5.dp,
+    shadowOffset: Dp = 4.dp
+) {
+    NeobrutalistButton(
+        onClick = onClick,
+        modifier = modifier,
+        containerColor = containerColor,
+        borderColor = borderColor,
+        shadowColor = shadowColor,
+        shape = shape,
+        borderWidth = borderWidth,
+        shadowOffset = shadowOffset
+    ) {
+        Text(
+            text = text,
+            style = NeobrutalismTheme.typography.labelLarge.copy(
+                fontWeight = FontWeight.Bold
+            ),
+            color = contentColor
+        )
+    }
+}
+

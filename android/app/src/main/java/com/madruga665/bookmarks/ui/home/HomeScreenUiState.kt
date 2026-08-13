@@ -1,6 +1,9 @@
 package com.madruga665.bookmarks.ui.home
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.IntSize
 import com.madruga665.bookmarks.data.local.CollectionEntity
+import com.madruga665.bookmarks.ui.components.CollectionOption
 
 sealed interface HomeScreenUiState {
     object Loading : HomeScreenUiState
@@ -9,7 +12,14 @@ sealed interface HomeScreenUiState {
         val collections: List<CollectionEntity>,
         val quickSaveUrlInput: String = "",
         val inputError: String? = null,
-        val isSaving: Boolean = false
+        val isSaving: Boolean = false,
+        val activeMenuCollection: CollectionEntity? = null,
+        val activeCardOffset: Offset? = null,
+        val activeCardSize: IntSize? = null,
+        val collectionToEdit: CollectionEntity? = null,
+        val collectionToDelete: CollectionEntity? = null,
+        val touchPositionInWindow: Offset? = null,
+        val hoveredOption: CollectionOption? = null
     ) : HomeScreenUiState
 
     data class Error(val message: String) : HomeScreenUiState

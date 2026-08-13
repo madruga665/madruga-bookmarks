@@ -29,8 +29,8 @@ class SaveBookmarkViewModelTest {
     private lateinit var viewModel: SaveBookmarkViewModel
 
     private val sampleCollections = listOf(
-        CollectionEntity("col_unsorted", "Unsorted", 0, "folder", "YELLOW", 0, 0),
-        CollectionEntity("col_ia", "IA", 2, "code", "YELLOW", 0, 0)
+        CollectionEntity("col_unsorted", "Unsorted", 0, 0, null, "folder", "YELLOW", 0, 0),
+        CollectionEntity("col_ia", "IA", 2, 0, null, "code", "YELLOW", 0, 0)
     )
 
     @Before
@@ -155,6 +155,8 @@ class SaveBookmarkViewModelTest {
             id = "col_design",
             name = "Design",
             linkCount = 0,
+            subcollectionCount = 0,
+            parentId = null,
             iconKey = "folder",
             colorAccent = "PURPLE",
             createdAt = System.currentTimeMillis(),
