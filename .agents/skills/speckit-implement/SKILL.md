@@ -1,6 +1,6 @@
 ---
 name: "speckit-implement"
-description: "Execute the implementation plan by processing and executing all tasks defined in tasks.md"
+description: "Execute the implementation plan by processing and executing all tasks defined in tasks.md using subagents"
 compatibility: "Requires spec-kit project structure with .specify/ directory"
 metadata:
   author: "github-spec-kit"
@@ -146,33 +146,39 @@ You **MUST** consider the user input before proceeding (if not empty).
    - **Task details**: ID, description, file paths, parallel markers [P]
    - **Execution flow**: Order and dependency requirements
 
-6. Execute implementation following the task plan:
-   - **Phase-by-phase execution**: Complete each phase before moving to the next
-   - **Respect dependencies**: Run sequential tasks in order, parallel tasks [P] can run together
-   - **Follow TDD approach**: Execute test tasks before their corresponding implementation tasks
-   - **File-based coordination**: Tasks affecting the same files must run sequentially
-   - **Validation checkpoints**: Verify each phase completion before proceeding
+6. **Execute implementation using subagents**:
+   - **Mandatory Subagent Delegation**: All implementation tasks from `tasks.md` MUST be executed by delegating to subagents via `invoke_subagent`. The main agent acts as orchestrator and supervisor.
+   - **Subagent Context & Task Assignment**: When launching a subagent, provide:
+     - The exact task ID(s) and full task description
+     - Target file paths to create or modify
+     - Architectural standards, tech stack requirements, and constraints from `plan.md` and `.specify/memory/constitution.md`
+     - Acceptance criteria and testing expectations
+   - **Parallel Tasks `[P]`**:
+     - Tasks marked with `[P]` that operate on distinct, independent files with no shared dependencies MUST be dispatched concurrently using `invoke_subagent` (specifying multiple subagents in a single call).
+   - **Sequential Tasks**:
+     - Tasks with dependencies or touching shared files MUST be executed sequentially, waiting for the preceding subagent to finish and validating its output before dispatching the next task.
+   - **Phase-by-phase execution**: Complete all tasks in each phase before proceeding to the next phase.
+   - **Follow TDD approach**: Delegate test creation tasks before their corresponding implementation tasks.
+   - **Validation checkpoints**: Verify each phase completion (e.g. running builds or test suites) before proceeding.
 
-7. Implementation execution rules:
-   - **Setup first**: Initialize project structure, dependencies, configuration
-   - **Tests before code**: If you need to write tests for contracts, entities, and integration scenarios
-   - **Core development**: Implement models, services, CLI commands, endpoints
-   - **Integration work**: Database connections, middleware, logging, external services
-   - **Polish and validation**: Unit tests, performance optimization, documentation
+7. **Implementation execution rules for subagents**:
+   - **Setup first**: Subagents initialize project structure, dependencies, configuration.
+   - **Tests before code**: Subagents implement unit and contract tests first if required by the plan/tasks.
+   - **Core development**: Subagents implement models, repositories, ViewModels, and UI composables/components.
+   - **Integration work**: Subagents handle database integrations, DAOs, Hilt DI modules, and state flows.
+   - **Polish and validation**: Subagents optimize performance, fix edge cases, and ensure clean architecture.
 
-8. Progress tracking and error handling:
-   - Report progress after each completed task
-   - Halt execution if any non-parallel task fails
-   - For parallel tasks [P], continue with successful tasks, report failed ones
-   - Provide clear error messages with context for debugging
-   - Suggest next steps if implementation cannot proceed
-   - **IMPORTANT** For completed tasks, make sure to mark the task off as [X] in the tasks file.
+8. **Progress tracking and error handling**:
+   - As each subagent completes its task, verify the changes and immediately mark the task off as `[X]` in `tasks.md`.
+   - Report progress after each completed task/phase.
+   - Halt execution if any non-parallel task fails or produces errors; relaunch subagent with corrective guidance if needed.
+   - For parallel tasks `[P]`, continue with successful tasks, handle and report any failed ones.
+   - Provide clear error messages with context for debugging.
 
-9. Completion validation:
-   - Verify all required tasks are completed
-   - Check that implemented features match the original specification
-   - Validate that tests pass and coverage meets requirements
-   - Confirm the implementation follows the technical plan
+9. **Completion validation**:
+   - Verify all required tasks in `tasks.md` are marked `[X]`.
+   - Run project verification (e.g., `./gradlew test` and `./gradlew check` for Android) to confirm zero regressions.
+   - Check that implemented features match the original specification and technical plan.
 
 Note: This command assumes a complete task breakdown exists in tasks.md. If tasks are incomplete or missing, suggest running `/speckit-tasks` first to regenerate the task list.
 
