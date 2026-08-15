@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bookmarks</string>
+
+    <!-- Navigation & Common -->
+    <string name="settings_title">Configurações</string>
+    <string name="back">Voltar</string>
+    <string name="dialog_cancel">Cancelar</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_apply">Aplicar</string>
+    <string name="dialog_select">Selecionar</string>
+
+    <!-- Usage Hero Card -->
+    <string name="app_hero_title">Madruga Bookmarks</string>
+    <string name="usage_total_links">Total de Links</string>
+    <string name="usage_links_today">Links Hoje</string>
+    <string name="usage_collections">Coleções</string>
+
+    <!-- Preferences Section -->
+    <string name="section_preferences">PREFERÊNCIAS</string>
+    <string name="pref_theme_title">Tema</string>
+    <string name="pref_theme_desc">Alterar tema de cores do aplicativo</string>
+    <string name="pref_language_title">Idioma</string>
+    <string name="pref_language_desc">Alterar idioma de exibição do aplicativo</string>
+    <string name="pref_haptic_title">Feedback Tátil</string>
+    <string name="pref_haptic_desc">Vibrar para ações e seleções</string>
+
+    <!-- Theme Selection -->
+    <string name="theme_select_title">Selecionar Tema</string>
+    <string name="theme_system">Padrão do Sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Catppuccin Mocha Escuro</string>
+
+    <!-- Language Selection -->
+    <string name="lang_select_title">Selecionar Idioma</string>
+    <string name="lang_system">Padrão do Sistema</string>
+    <string name="lang_en">English</string>
+    <string name="lang_pt_br">Português (Brasil)</string>
+
+    <!-- Data Management & Actions -->
+    <string name="section_your_data">SEUS DADOS</string>
+    <string name="action_export_backup">Exportar Backup</string>
+    <string name="action_export_backup_desc">Exportar todos os favoritos e coleções</string>
+    <string name="action_restore_backup">Restaurar Backup</string>
+    <string name="action_restore_backup_desc">Restaurar a partir de um arquivo de backup</string>
+
+    <!-- Import Section -->
+    <string name="section_import">IMPORTAR DE OUTROS APPS</string>
+    <string name="action_import_bookmarks">Importar Favoritos</string>
+    <string name="action_import_bookmarks_desc">Importar do navegador ou arquivo HTML</string>
+
+    <!-- About Section -->
+    <string name="section_about">SOBRE</string>
+    <string name="about_version">Versão</string>
+</resources>

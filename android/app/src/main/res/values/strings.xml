@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bookmarks</string>
+
+    <!-- Navigation & Common -->
+    <string name="settings_title">Settings</string>
+    <string name="back">Back</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_apply">Apply</string>
+    <string name="dialog_select">Select</string>
+
+    <!-- Usage Hero Card -->
+    <string name="app_hero_title">Madruga Bookmarks</string>
+    <string name="usage_total_links">Total Links</string>
+    <string name="usage_links_today">Links Today</string>
+    <string name="usage_collections">Collections</string>
+
+    <!-- Preferences Section -->
+    <string name="section_preferences">PREFERENCES</string>
+    <string name="pref_theme_title">Theme</string>
+    <string name="pref_theme_desc">Change app color theme</string>
+    <string name="pref_language_title">Language</string>
+    <string name="pref_language_desc">Change app display language</string>
+    <string name="pref_haptic_title">Haptic Feedback</string>
+    <string name="pref_haptic_desc">Vibrate for actions and selections</string>
+
+    <!-- Theme Selection -->
+    <string name="theme_select_title">Select Theme</string>
+    <string name="theme_system">System Default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Catppuccin Mocha Dark</string>
+
+    <!-- Language Selection -->
+    <string name="lang_select_title">Select Language</string>
+    <string name="lang_system">System Default</string>
+    <string name="lang_en">English</string>
+    <string name="lang_pt_br">Português (Brasil)</string>
+
+    <!-- Data Management & Actions -->
+    <string name="section_your_data">YOUR DATA</string>
+    <string name="action_export_backup">Export Backup</string>
+    <string name="action_export_backup_desc">Export all bookmarks and collections</string>
+    <string name="action_restore_backup">Restore Backup</string>
+    <string name="action_restore_backup_desc">Restore from a backup file</string>
+
+    <!-- Import Section -->
+    <string name="section_import">IMPORT FROM OTHER APPS</string>
+    <string name="action_import_bookmarks">Import Bookmarks</string>
+    <string name="action_import_bookmarks_desc">Import from browser or HTML file</string>
+
+    <!-- About Section -->
+    <string name="section_about">ABOUT</string>
+    <string name="about_version">Version</string>
+</resources>

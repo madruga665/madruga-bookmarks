@@ -20,12 +20,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.madruga665.bookmarks.data.repository.BookmarkRepository
 import com.madruga665.bookmarks.data.repository.CollectionRepository
+import com.madruga665.bookmarks.data.repository.SettingsRepository
 import com.madruga665.bookmarks.ui.collection.CollectionDetailScreen
 import com.madruga665.bookmarks.ui.collection.CollectionDetailViewModel
 import com.madruga665.bookmarks.ui.home.HomeScreen
 import com.madruga665.bookmarks.ui.home.HomeViewModel
 import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkBottomSheet
 import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkViewModel
+import com.madruga665.bookmarks.ui.settings.SettingsScreen
+import com.madruga665.bookmarks.ui.settings.SettingsViewModel
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 
 object NavRoutes {
@@ -44,6 +47,7 @@ fun BookmarksNavGraph(
     saveBookmarkViewModel: SaveBookmarkViewModel,
     collectionRepository: CollectionRepository,
     bookmarkRepository: BookmarkRepository,
+    settingsRepository: SettingsRepository,
     navController: NavHostController = rememberNavController()
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
@@ -98,7 +102,32 @@ fun BookmarksNavGraph(
         }
 
         composable(NavRoutes.SETTINGS) {
-            PlaceholderDestination(title = "Settings Screen")
+            val context = LocalContext.current
+            val settingsViewModel = remember {
+                SettingsViewModel(
+                    settingsRepository = settingsRepository,
+                    bookmarkRepository = bookmarkRepository,
+                    collectionRepository = collectionRepository
+                )
+            }
+            val settingsUiState by settingsViewModel.uiState.collectAsState()
+
+            SettingsScreen(
+                uiState = settingsUiState,
+                onBackClick = { navController.popBackStack() },
+                onThemeSelect = settingsViewModel::setThemeMode,
+                onLanguageSelect = settingsViewModel::setLanguage,
+                onToggleHapticFeedback = settingsViewModel::toggleHapticFeedback,
+                onExportBackupClick = {
+                    Toast.makeText(context, "Exporting backup...", Toast.LENGTH_SHORT).show()
+                },
+                onRestoreBackupClick = {
+                    Toast.makeText(context, "Restore Backup feature coming soon", Toast.LENGTH_SHORT).show()
+                },
+                onImportBookmarksClick = {
+                    Toast.makeText(context, "Import Bookmarks feature coming soon", Toast.LENGTH_SHORT).show()
+                }
+            )
         }
 
         composable(NavRoutes.MANAGE_COLLECTIONS) {

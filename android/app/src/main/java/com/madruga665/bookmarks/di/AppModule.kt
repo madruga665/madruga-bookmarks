@@ -7,6 +7,7 @@ import com.madruga665.bookmarks.data.local.BookmarkDao
 import com.madruga665.bookmarks.data.local.CollectionDao
 import com.madruga665.bookmarks.data.repository.BookmarkRepository
 import com.madruga665.bookmarks.data.repository.CollectionRepository
+import com.madruga665.bookmarks.data.repository.SettingsRepository
 import com.madruga665.bookmarks.data.repository.ThemeRepository
 import dagger.Module
 import dagger.Provides
@@ -27,7 +28,6 @@ object AppModule {
             AppDatabase::class.java,
             "bookmarks_db"
         ).fallbackToDestructiveMigration(dropAllTables = true).build()
-
     }
 
     @Provides
@@ -53,7 +53,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideThemeRepository(@ApplicationContext context: Context): ThemeRepository {
-        return ThemeRepository(context)
+    fun provideSettingsRepository(@ApplicationContext context: Context): SettingsRepository {
+        return SettingsRepository(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideThemeRepository(settingsRepository: SettingsRepository): ThemeRepository {
+        return ThemeRepository(settingsRepository)
     }
 }

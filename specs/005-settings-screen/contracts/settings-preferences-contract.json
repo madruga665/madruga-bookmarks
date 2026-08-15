@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "UserPreferencesSyncContract",
+  "description": "Schema for user preferences state and settings synchronization across mobile and web",
+  "type": "object",
+  "properties": {
+    "themeMode": {
+      "type": "string",
+      "enum": ["LIGHT", "CATPPUCCIN_MOCHA", "SYSTEM"],
+      "default": "SYSTEM"
+    },
+    "language": {
+      "type": "string",
+      "enum": ["EN", "PT_BR", "SYSTEM"],
+      "default": "SYSTEM"
+    },
+    "hapticFeedbackEnabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "updatedAt": {
+      "type": "integer",
+      "description": "Timestamp epoch milliseconds when preferences were last modified"
+    }
+  },
+  "required": ["themeMode", "language", "hapticFeedbackEnabled"]
+}

@@ -4,8 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.madruga665.bookmarks.data.repository.AppThemeMode
 import com.madruga665.bookmarks.data.repository.BookmarkRepository
 import com.madruga665.bookmarks.data.repository.CollectionRepository
+import com.madruga665.bookmarks.data.repository.SettingsRepository
 import com.madruga665.bookmarks.ui.home.HomeViewModel
 import com.madruga665.bookmarks.ui.navigation.BookmarksNavGraph
 import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkViewModel
@@ -27,16 +32,28 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var bookmarkRepository: BookmarkRepository
 
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         handleShareIntent(intent)
         setContent {
-            NeobrutalismTheme {
+            val themeMode by settingsRepository.themeMode.collectAsState(initial = AppThemeMode.SYSTEM)
+            val isSystemDark = isSystemInDarkTheme()
+            val darkTheme = when (themeMode) {
+                AppThemeMode.LIGHT -> false
+                AppThemeMode.CATPPUCCIN_MOCHA -> true
+                AppThemeMode.SYSTEM -> isSystemDark
+            }
+
+            NeobrutalismTheme(darkTheme = darkTheme) {
                 BookmarksNavGraph(
                     homeViewModel = homeViewModel,
                     saveBookmarkViewModel = saveBookmarkViewModel,
                     collectionRepository = collectionRepository,
-                    bookmarkRepository = bookmarkRepository
+                    bookmarkRepository = bookmarkRepository,
+                    settingsRepository = settingsRepository
                 )
             }
         }
