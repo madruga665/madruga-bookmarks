@@ -46,6 +46,67 @@ class BookmarkRepository(
         }
     }
 
+    fun getBookmarkById(bookmarkId: String): Flow<BookmarkEntity?> =
+        bookmarkDao.getBookmarkById(bookmarkId)
+
+    suspend fun updateTitle(bookmarkId: String, newTitle: String) = withContext(Dispatchers.IO) {
+        bookmarkDao.updateBookmarkTitle(bookmarkId, newTitle.trim(), System.currentTimeMillis())
+    }
+
+    suspend fun updateNotes(bookmarkId: String, newNotes: String?) = withContext(Dispatchers.IO) {
+        bookmarkDao.updateBookmarkNotes(bookmarkId, newNotes?.trim(), System.currentTimeMillis())
+    }
+
+    suspend fun addTag(bookmarkId: String, tag: String) = withContext(Dispatchers.IO) {
+        val trimmedTag = tag.trim()
+        if (trimmedTag.isBlank()) return@withContext
+        val bookmark = bookmarkDao.getBookmarkByIdDirect(bookmarkId) ?: return@withContext
+        val currentTags = bookmark.tags.split(",").map { it.trim() }.filter { it.isNotBlank() }
+        if (!currentTags.any { it.equals(trimmedTag, ignoreCase = true) }) {
+            val newTags = (currentTags + trimmedTag).joinToString(",")
+            bookmarkDao.updateBookmarkTags(bookmarkId, newTags, System.currentTimeMillis())
+        }
+    }
+
+    suspend fun removeTag(bookmarkId: String, tag: String) = withContext(Dispatchers.IO) {
+        val trimmedTag = tag.trim()
+        if (trimmedTag.isBlank()) return@withContext
+        val bookmark = bookmarkDao.getBookmarkByIdDirect(bookmarkId) ?: return@withContext
+        val currentTags = bookmark.tags.split(",").map { it.trim() }.filter { it.isNotBlank() }
+        val newTags = currentTags.filterNot { it.equals(trimmedTag, ignoreCase = true) }.joinToString(",")
+        bookmarkDao.updateBookmarkTags(bookmarkId, newTags, System.currentTimeMillis())
+    }
+
+    suspend fun togglePin(bookmarkId: String) = withContext(Dispatchers.IO) {
+        val bookmark = bookmarkDao.getBookmarkByIdDirect(bookmarkId) ?: return@withContext
+        bookmarkDao.updateBookmarkPinned(bookmarkId, !bookmark.isPinned, System.currentTimeMillis())
+    }
+
+    suspend fun moveToCollection(bookmarkId: String, newCollectionId: String) = withContext(Dispatchers.IO) {
+        val targetCollection = if (newCollectionId.isBlank()) "col_unsorted" else newCollectionId
+        bookmarkDao.updateBookmarkCollection(bookmarkId, targetCollection, System.currentTimeMillis())
+    }
+
+    suspend fun deleteBookmark(bookmarkId: String) = withContext(Dispatchers.IO) {
+        bookmarkDao.deleteBookmarkById(bookmarkId)
+    }
+
+    suspend fun refreshMetadata(bookmarkId: String): Boolean = withContext(Dispatchers.IO) {
+        val bookmark = bookmarkDao.getBookmarkByIdDirect(bookmarkId) ?: return@withContext false
+        val metadata = LinkMetadataExtractor.extractMetadata(bookmark.url)
+        val updated = bookmark.copy(
+            title = metadata.title ?: bookmark.title,
+            thumbnailUrl = metadata.thumbnailUrl ?: bookmark.thumbnailUrl,
+            description = metadata.description ?: bookmark.description,
+            sourcePlatform = metadata.sourcePlatform ?: bookmark.sourcePlatform,
+            faviconUrl = metadata.faviconUrl ?: bookmark.faviconUrl,
+            updatedAt = System.currentTimeMillis(),
+            syncStatus = "PENDING_SYNC"
+        )
+        bookmarkDao.updateBookmark(updated)
+        return@withContext true
+    }
+
     suspend fun quickSaveBookmark(
         url: String,
         collectionId: String = "col_unsorted",
@@ -62,12 +123,16 @@ class BookmarkRepository(
             id = UUID.randomUUID().toString(),
             url = trimmedUrl,
             title = metadata.title ?: parseTitleFromUrlFallback(trimmedUrl),
+            description = metadata.description,
             faviconUrl = metadata.faviconUrl,
             thumbnailUrl = metadata.thumbnailUrl ?: generateFallbackThumbnailUrl(trimmedUrl),
             sourcePlatform = metadata.sourcePlatform ?: "Web",
             collectionId = if (collectionId.isBlank()) "col_unsorted" else collectionId,
+            notes = null,
+            tags = "",
             isPinned = isPinned,
             createdAt = System.currentTimeMillis(),
+            updatedAt = System.currentTimeMillis(),
             syncStatus = "PENDING_SYNC"
         )
         bookmarkDao.insertBookmark(entity)
@@ -85,24 +150,32 @@ class BookmarkRepository(
             id = "bm_ia_1",
             url = "https://www.instagram.com/devemdobro",
             title = "Dev em dobro | Programação on Instagram",
+            description = "Comenta CLAUDE aqui embaixo que eu te mando a lista das 12 com o comando de instalação de cada uma. 👇\n\nA maioria instala o Claude Code e usa 10% do que ele faz.\n\nEssas 12 coisas são o que separa quem usa de quem sabe usar, e todas saem da documentação oficial.",
             faviconUrl = "https://www.google.com/s2/favicons?domain=instagram.com&sz=128",
             thumbnailUrl = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
             sourcePlatform = "Instagram",
             collectionId = "col_ia",
+            notes = null,
+            tags = "IA",
             isPinned = false,
             createdAt = System.currentTimeMillis(),
+            updatedAt = System.currentTimeMillis(),
             syncStatus = "SYNCED"
         ),
         BookmarkEntity(
             id = "bm_ia_2",
             url = "https://www.instagram.com/devemdobro/p/sample",
             title = "Dev em dobro | Programação on Instagram",
+            description = "Comenta CLAUDE aqui embaixo que eu te mando a lista das 12 com o comando de instalação de cada uma. 👇\n\nA maioria instala o Claude Code e usa 10% do que ele faz.\n\nEssas 12 coisas são o que separa quem usa de quem sabe usar, e todas saem da documentação oficial.",
             faviconUrl = "https://www.google.com/s2/favicons?domain=instagram.com&sz=128",
             thumbnailUrl = "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600&auto=format&fit=crop&q=80",
             sourcePlatform = "Instagram",
             collectionId = "col_ia",
+            notes = null,
+            tags = "IA",
             isPinned = false,
             createdAt = System.currentTimeMillis() - 1000,
+            updatedAt = System.currentTimeMillis() - 1000,
             syncStatus = "SYNCED"
         )
     )

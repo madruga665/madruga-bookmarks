@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BookmarkDetailsNavigationContract",
+  "description": "Navigation, UI state, and action contract for Bookmark Details View",
+  "type": "object",
+  "properties": {
+    "route": {
+      "type": "string",
+      "example": "bookmark/{bookmarkId}"
+    },
+    "navigationParameters": {
+      "type": "object",
+      "properties": {
+        "bookmarkId": {
+          "type": "string",
+          "description": "Unique identifier of the bookmark"
+        }
+      },
+      "required": ["bookmarkId"]
+    },
+    "uiState": {
+      "type": "object",
+      "properties": {
+        "bookmark": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "url": { "type": "string" },
+            "title": { "type": ["string", "null"] },
+            "description": { "type": ["string", "null"] },
+            "thumbnailUrl": { "type": ["string", "null"] },
+            "faviconUrl": { "type": ["string", "null"] },
+            "sourcePlatform": { "type": ["string", "null"] },
+            "collectionId": { "type": "string" },
+            "collectionName": { "type": "string" },
+            "tags": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "notes": { "type": ["string", "null"] },
+            "isPinned": { "type": "boolean" },
+            "createdAtFormatted": { "type": "string", "example": "11 Aug 2026, 3:09 PM" }
+          },
+          "required": ["id", "url", "isPinned", "collectionId"]
+        },
+        "isEditingTitle": { "type": "boolean" },
+        "isEditingNotes": { "type": "boolean" },
+        "isAddingTag": { "type": "boolean" },
+        "isConfirmingDelete": { "type": "boolean" },
+        "isMoveSheetVisible": { "type": "boolean" },
+        "availableCollections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "iconKey": { "type": "string" },
+              "colorAccent": { "type": "string" }
+            },
+            "required": ["id", "name"]
+          }
+        },
+        "isLoading": { "type": "boolean" },
+        "errorMessage": { "type": ["string", "null"] }
+      },
+      "required": ["isLoading", "isEditingTitle", "isEditingNotes", "isAddingTag", "isConfirmingDelete", "isMoveSheetVisible"]
+    }
+  }
+}

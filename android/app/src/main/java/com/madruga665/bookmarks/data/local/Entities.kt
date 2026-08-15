@@ -22,11 +22,15 @@ data class BookmarkEntity(
     @PrimaryKey val id: String,
     @ColumnInfo(name = "url") val url: String,
     @ColumnInfo(name = "title") val title: String?,
+    @ColumnInfo(name = "description") val description: String? = null,
     @ColumnInfo(name = "favicon_url") val faviconUrl: String?,
     @ColumnInfo(name = "thumbnail_url") val thumbnailUrl: String? = null,
     @ColumnInfo(name = "source_platform") val sourcePlatform: String? = null,
     @ColumnInfo(name = "collection_id") val collectionId: String = "col_unsorted",
+    @ColumnInfo(name = "notes") val notes: String? = null,
+    @ColumnInfo(name = "tags") val tags: String = "",
     @ColumnInfo(name = "is_pinned") val isPinned: Boolean = false,
     @ColumnInfo(name = "created_at") val createdAt: Long,
+    @ColumnInfo(name = "updated_at") val updatedAt: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "sync_status") val syncStatus: String = "PENDING_SYNC"
 )

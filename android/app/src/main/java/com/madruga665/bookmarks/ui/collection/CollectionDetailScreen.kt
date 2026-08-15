@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,6 +40,9 @@ fun CollectionDetailScreen(
     val linkCount = uiState.bookmarks.size
     val subcollectionCount = uiState.collection?.subcollectionCount ?: 0
     val subtitle = "$linkCount links · $subcollectionCount subcollections"
+
+    val pinned = uiState.bookmarks.filter { it.isPinned }
+    val allOthers = uiState.bookmarks.filter { !it.isPinned }
 
     Column(
         modifier = modifier
@@ -80,16 +84,6 @@ fun CollectionDetailScreen(
                 }
             }
             else -> {
-                Text(
-                    text = "ALL LINKS ($linkCount)",
-                    style = NeobrutalismTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    ),
-                    color = NeobrutalismTheme.colors.onSurface,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -98,14 +92,56 @@ fun CollectionDetailScreen(
                         .fillMaxSize()
                         .testTag("tag_collection_detail_grid")
                 ) {
-                    items(
-                        items = uiState.bookmarks,
-                        key = { it.id }
-                    ) { bookmark ->
-                        NeobrutalistBookmarkCard(
-                            bookmark = bookmark,
-                            onClick = { onBookmarkClick(bookmark) }
-                        )
+                    if (pinned.isNotEmpty()) {
+                        item(span = { GridItemSpan(2) }) {
+                            Text(
+                                text = "PINNED (${pinned.size})",
+                                style = NeobrutalismTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                ),
+                                color = NeobrutalismTheme.colors.onSurface,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        }
+
+                        items(
+                            items = pinned,
+                            key = { "pinned_${it.id}" }
+                        ) { bookmark ->
+                            NeobrutalistBookmarkCard(
+                                bookmark = bookmark,
+                                onClick = { onBookmarkClick(bookmark) }
+                            )
+                        }
+
+                        item(span = { GridItemSpan(2) }) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+
+                    if (allOthers.isNotEmpty() || pinned.isEmpty()) {
+                        item(span = { GridItemSpan(2) }) {
+                            Text(
+                                text = if (pinned.isNotEmpty()) "ALL LINKS (${allOthers.size})" else "ALL LINKS ($linkCount)",
+                                style = NeobrutalismTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                ),
+                                color = NeobrutalismTheme.colors.onSurface,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        }
+
+                        items(
+                            items = allOthers,
+                            key = { it.id }
+                        ) { bookmark ->
+                            NeobrutalistBookmarkCard(
+                                bookmark = bookmark,
+                                onClick = { onBookmarkClick(bookmark) }
+                            )
+                        }
                     }
                 }
             }

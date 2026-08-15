@@ -21,6 +21,10 @@ import androidx.navigation.compose.rememberNavController
 import com.madruga665.bookmarks.data.repository.BookmarkRepository
 import com.madruga665.bookmarks.data.repository.CollectionRepository
 import com.madruga665.bookmarks.data.repository.SettingsRepository
+import com.madruga665.bookmarks.ui.bookmark.BookmarkDetailScreen
+import com.madruga665.bookmarks.ui.bookmark.BookmarkDetailViewModel
+import com.madruga665.bookmarks.ui.bookmark.openBrowserUrl
+import com.madruga665.bookmarks.ui.bookmark.shareBookmark
 import com.madruga665.bookmarks.ui.collection.CollectionDetailScreen
 import com.madruga665.bookmarks.ui.collection.CollectionDetailViewModel
 import com.madruga665.bookmarks.ui.home.HomeScreen
@@ -30,6 +34,7 @@ import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkViewModel
 import com.madruga665.bookmarks.ui.settings.SettingsScreen
 import com.madruga665.bookmarks.ui.settings.SettingsViewModel
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
+import androidx.lifecycle.SavedStateHandle
 
 object NavRoutes {
     const val HOME = "home"
@@ -37,8 +42,10 @@ object NavRoutes {
     const val SETTINGS = "settings"
     const val MANAGE_COLLECTIONS = "manage_collections"
     const val FOLDER_DETAIL = "folder_detail/{folderId}"
+    const val BOOKMARK_DETAIL = "bookmark_detail/{bookmarkId}"
 
     fun folderDetail(folderId: String) = "folder_detail/$folderId"
+    fun bookmarkDetail(bookmarkId: String) = "bookmark_detail/$bookmarkId"
 }
 
 @Composable
@@ -160,12 +167,7 @@ fun BookmarksNavGraph(
                     // Options click handler
                 },
                 onBookmarkClick = { bookmark ->
-                    try {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(bookmark.url))
-                        context.startActivity(intent)
-                    } catch (e: Exception) {
-                        Toast.makeText(context, "Could not open URL: ${bookmark.url}", Toast.LENGTH_SHORT).show()
-                    }
+                    navController.navigate(NavRoutes.bookmarkDetail(bookmark.id))
                 },
                 onSubcollectionClick = { subcollectionId ->
                     navController.navigate(NavRoutes.folderDetail(subcollectionId))
@@ -186,6 +188,59 @@ fun BookmarksNavGraph(
                     }
                 },
                 onDismiss = saveBookmarkViewModel::dismissModal
+            )
+        }
+
+        composable(NavRoutes.BOOKMARK_DETAIL) { backStackEntry ->
+            val context = LocalContext.current
+            val bookmarkId = backStackEntry.arguments?.getString("bookmarkId") ?: ""
+            val bookmarkDetailViewModel = remember(bookmarkId) {
+                BookmarkDetailViewModel(
+                    bookmarkRepository = bookmarkRepository,
+                    collectionRepository = collectionRepository,
+                    savedStateHandle = SavedStateHandle(mapOf("bookmarkId" to bookmarkId))
+                )
+            }
+            val bookmarkUiState by bookmarkDetailViewModel.uiState.collectAsState()
+
+            BookmarkDetailScreen(
+                uiState = bookmarkUiState,
+                onBackClick = { navController.popBackStack() },
+                onRefreshClick = bookmarkDetailViewModel::onRefreshMetadata,
+                onShareClick = {
+                    bookmarkUiState.bookmark?.let { bm ->
+                        shareBookmark(context, bm.title, bm.url)
+                    }
+                },
+                onMoveClick = bookmarkDetailViewModel::onOpenMoveCollectionSheet,
+                onDeleteClick = bookmarkDetailViewModel::onOpenDeleteDialog,
+                onTogglePin = bookmarkDetailViewModel::onTogglePin,
+                onStartEditingTitle = bookmarkDetailViewModel::onStartEditingTitle,
+                onTitleChange = bookmarkDetailViewModel::onTitleChange,
+                onSaveTitle = bookmarkDetailViewModel::onSaveTitle,
+                onCancelEditingTitle = bookmarkDetailViewModel::onCancelEditingTitle,
+                onUrlClick = { url -> openBrowserUrl(context, url) },
+                onToggleDescriptionExpanded = bookmarkDetailViewModel::onToggleDescriptionExpanded,
+                onStartEditingNotes = bookmarkDetailViewModel::onStartEditingNotes,
+                onNotesChange = bookmarkDetailViewModel::onNotesChange,
+                onSaveNotes = bookmarkDetailViewModel::onSaveNotes,
+                onCancelEditingNotes = bookmarkDetailViewModel::onCancelEditingNotes,
+                onOpenAddTagDialog = bookmarkDetailViewModel::onOpenAddTagDialog,
+                onNewTagInputChange = bookmarkDetailViewModel::onNewTagInputChange,
+                onSaveNewTag = bookmarkDetailViewModel::onSaveNewTag,
+                onDismissAddTagDialog = bookmarkDetailViewModel::onDismissAddTagDialog,
+                onRemoveTag = bookmarkDetailViewModel::onRemoveTag,
+                onOpenMoveCollectionSheet = bookmarkDetailViewModel::onOpenMoveCollectionSheet,
+                onDismissMoveCollectionSheet = bookmarkDetailViewModel::onDismissMoveCollectionSheet,
+                onSelectCollection = bookmarkDetailViewModel::onSelectCollection,
+                onOpenDeleteDialog = bookmarkDetailViewModel::onOpenDeleteDialog,
+                onDismissDeleteDialog = bookmarkDetailViewModel::onDismissDeleteDialog,
+                onConfirmDelete = {
+                    bookmarkDetailViewModel.onConfirmDelete {
+                        navController.popBackStack()
+                    }
+                },
+                onClearUserMessage = bookmarkDetailViewModel::clearUserMessage
             )
         }
     }

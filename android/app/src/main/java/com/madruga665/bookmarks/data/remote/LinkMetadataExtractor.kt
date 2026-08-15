@@ -9,7 +9,8 @@ data class LinkMetadata(
     val title: String?,
     val faviconUrl: String?,
     val thumbnailUrl: String?,
-    val sourcePlatform: String?
+    val sourcePlatform: String?,
+    val description: String? = null
 )
 
 object LinkMetadataExtractor {
@@ -37,16 +38,21 @@ object LinkMetadataExtractor {
         try {
             val doc = Jsoup.connect(cleanUrl)
                 .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-                .timeout(5000)
+                .timeout(10000)
                 .get()
 
             val ogTitle = doc.select("meta[property=og:title]").attr("content").takeIf { it.isNotBlank() }
-            val twitterTitle = doc.select("meta[name=twitter:title]").attr("content").takeIf { it.isNotBlank() }
+            val twitterTitle = doc.select("meta[property=og:title]").attr("content").takeIf { it.isNotBlank() }
             val pageTitle = doc.title().takeIf { it.isNotBlank() }
             val title = ogTitle ?: twitterTitle ?: pageTitle ?: defaultPlatform
 
+            val ogDescription = doc.select("meta[property=og:description]").attr("content").takeIf { it.isNotBlank() }
+            val twitterDescription = doc.select("meta[name=twitter:description]").attr("content").takeIf { it.isNotBlank() }
+            val metaDescription = doc.select("meta[name=description]").attr("content").takeIf { it.isNotBlank() }
+            val description = ogDescription ?: twitterDescription ?: metaDescription
+
             val ogImage = doc.select("meta[property=og:image]").attr("content").takeIf { it.isNotBlank() }
-            val twitterImage = doc.select("meta[name=twitter:image]").attr("content").takeIf { it.isNotBlank() }
+            val twitterImage = doc.select("meta[property=og:image]").attr("content").takeIf { it.isNotBlank() }
             val thumbnailUrl = ogImage ?: twitterImage
 
             val ogSiteName = doc.select("meta[property=og:site_name]").attr("content").takeIf { it.isNotBlank() }
@@ -59,14 +65,16 @@ object LinkMetadataExtractor {
                 title = title,
                 faviconUrl = faviconUrl,
                 thumbnailUrl = thumbnailUrl,
-                sourcePlatform = sourcePlatform
+                sourcePlatform = sourcePlatform,
+                description = description
             )
         } catch (e: Exception) {
             LinkMetadata(
                 title = defaultPlatform,
                 faviconUrl = defaultFavicon,
                 thumbnailUrl = null,
-                sourcePlatform = defaultPlatform
+                sourcePlatform = defaultPlatform,
+                description = null
             )
         }
     }
