@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Bookmarks"
+rootProject.name = "madruga665-bookmarks-app"
 include(":app")
