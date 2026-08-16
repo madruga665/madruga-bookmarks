@@ -8,7 +8,6 @@
 Run all unit tests in the repository:
 
 ```bash
-cd android
 ./gradlew testDebugUnitTest
 ```
 

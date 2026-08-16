@@ -16,10 +16,9 @@ This guide provides runnable instructions to verify the Bookmark Details View fe
 
 ## 2. Automated Test Verification
 
-Run all unit tests from the `android/` directory:
+Run all unit tests from the repository root:
 
 ```bash
-cd android
 ./gradlew test
 ```
 
@@ -39,7 +38,6 @@ cd android
 
 1. **Launch App**: Build and install debug APK on emulator or connected device:
    ```bash
-   cd android
    ./gradlew installDebug
    ```
 2. **Open Collection**: Tap on a collection card (e.g. "IA" or "Vagas").

@@ -2,7 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-08-15
-**Feature**: [spec.md](file:///home/madruga665/Projetos/madruga665-bookmarks/specs/007-app-localization/spec.md)
+**Feature**: [spec.md](../spec.md)
 
 ## Content Quality
 

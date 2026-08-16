@@ -1,12 +1,12 @@
 # AGENTS.md - AI Agent Context & Guidelines
 
-Welcome AI Agent! This document serves as the official operational guide and architectural reference for working within the **madruga665-bookmarks** repository.
+Welcome AI Agent! This document serves as the official operational guide and architectural reference for working within the **madruga665-bookmarks-app** repository.
 
 ---
 
 ## 1. Project Overview & Core Principles
 
-**madruga665-bookmarks** is a cross-platform Bookmarks Synchronization system designed for instant link capture, folder organization, fast search discovery, and offline resiliency.
+**madruga665-bookmarks-app** is a cross-platform Bookmarks Synchronization system designed for instant link capture, folder organization, fast search discovery, and offline resiliency.
 
 All development in this repository is governed by the project constitution in [`.specify/memory/constitution.md`](.specify/memory/constitution.md):
 
@@ -21,7 +21,7 @@ All development in this repository is governed by the project constitution in [`
 ## 2. Directory Structure
 
 ```text
-madruga665-bookmarks/
+madruga665-bookmarks-app/
 ├── .specify/                   # SpecKit framework configuration & project constitution
 │   ├── memory/constitution.md  # Governance & core architectural principles
 │   └── templates/              # Markdown templates (spec, plan, tasks, checklist)
@@ -30,18 +30,21 @@ madruga665-bookmarks/
 │   ├── 001-android-home-neobrutalism/
 │   ├── 002-save-bookmark-modal/
 │   ├── 003-collection-bookmarks-list/
-│   └── 004-collection-actions-menu/
-└── android/                    # Android Native Client (Kotlin + Jetpack Compose)
-    ├── .agents/skills/         # Android specific agent skills (Clean Architecture, Hilt, Compose, Room)
-    ├── build.gradle.kts        # Root Gradle build script
-    └── app/                    # Main Android module (`com.madruga665.bookmarks`)
+│   ├── 004-collection-actions-menu/
+│   ├── 005-settings-screen/
+│   ├── 006-bookmark-details/
+│   └── 007-app-localization/
+├── build.gradle.kts            # Root Gradle build script
+├── settings.gradle.kts         # Gradle settings (rootProject.name = "madruga665-bookmarks-app")
+├── gradlew / gradlew.bat       # Gradle wrapper executables
+└── app/                        # Main Android application module (`com.madruga665.bookmarks`)
 ```
 
 ---
 
 ## 3. Technology Stack
 
-### Android Client (`/android`)
+### Android Client
 - **Language**: Kotlin 2.2.10 (JVM Target 17)
 - **UI Framework**: Jetpack Compose + Material 3 with Neobrutalism Design Tokens
 - **Architecture**: Clean Architecture (UI / Domain-Repository / Data) + Unidirectional Data Flow (UDF)
@@ -55,12 +58,9 @@ madruga665-bookmarks/
 
 ## 4. Development & Build Commands
 
-All Gradle commands **must** be executed from inside the `android/` directory:
+All Gradle commands are executed directly from the project root (`madruga665-bookmarks-app/`):
 
 ```bash
-# Navigate to android directory if executing via shell
-cd android
-
 # Run all unit tests
 ./gradlew test
 

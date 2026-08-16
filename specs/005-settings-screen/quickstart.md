@@ -4,7 +4,7 @@ This guide outlines end-to-end steps to verify the Settings screen, theme switch
 
 ## Prerequisites
 - Android device or emulator running API 26+
-- Project build passing: `cd android && ./gradlew test`
+- Project build passing: `./gradlew test`
 
 ---
 
@@ -54,6 +54,5 @@ This guide outlines end-to-end steps to verify the Settings screen, theme switch
 ## Automated Test Execution
 
 ```bash
-cd android
 ./gradlew testDebugUnitTest
 ```

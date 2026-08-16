@@ -8,16 +8,13 @@ This document describes how to execute manual and automated verification scenari
 
 - Android Studio Hedgehog (2023.1.1+) or Android SDK 34 installed
 - Android Emulator or physical device connected via ADB (`adb devices`)
-- Repository root: `/home/madruga665/Projetos/madruga665-bookmarks`
+- Repository root: `/home/madruga665/Projetos/madruga665-bookmarks/madruga665-bookmarks-app`
 
 ---
 
 ## Setup & Build Commands
 
 ```bash
-# Navigate to Android project root
-cd /home/madruga665/Projetos/madruga665-bookmarks/android
-
 # Build debug APK
 ./gradlew assembleDebug
 

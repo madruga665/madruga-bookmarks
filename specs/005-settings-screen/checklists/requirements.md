@@ -2,7 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-08-14
-**Feature**: [spec.md](file:///home/madruga665/Projetos/madruga665-bookmarks/specs/005-settings-screen/spec.md)
+**Feature**: [spec.md](../spec.md)
 
 ## Content Quality
 

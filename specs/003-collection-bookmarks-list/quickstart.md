@@ -10,7 +10,6 @@
 Run unit tests for Room DAOs, Repositories, and Collection Detail ViewModel:
 
 ```bash
-cd android
 ./gradlew testDebugUnitTest
 ```
 
@@ -18,7 +17,6 @@ cd android
 Build and install debug APK:
 
 ```bash
-cd android
 ./gradlew installDebug
 ```
 
