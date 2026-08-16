@@ -1,0 +1,10 @@
+# SpecKit Extensions Configuration
+# Automated lifecycle hooks for madruga665-bookmarks-app
+
+hooks:
+  after_implement:
+    - extension: "Code Reviewer"
+      command: "code-reviewer"
+      description: "Run automated dual-axis code review (Standards & Spec) on implemented changes"
+      prompt: "Perform a dual-axis code review on the implementation against the active feature spec and codebase standards."
+      optional: false

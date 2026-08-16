@@ -1,6 +1,6 @@
 ---
 name: "speckit-specify"
-description: "Create or update the feature specification from a natural language feature description."
+description: "Create or update the feature specification from a natural language feature description, create a git branch named after the spec, and invoke /grill-me for design alignment."
 compatibility: "Requires spec-kit project structure with .specify/ directory"
 metadata:
   author: "github-spec-kit"
@@ -70,44 +70,26 @@ Given that feature description, do this:
      - "Create a dashboard for analytics" → "analytics-dashboard"
      - "Fix payment processing timeout bug" → "fix-payment-timeout"
 
-2. **Branch creation** (optional, via hook):
-
-   If a `before_specify` hook ran successfully in the Pre-Execution Checks above, it will have created/switched to a git branch and output JSON containing `BRANCH_NAME` and `FEATURE_NUM`. Note these values for reference, but the branch name does **not** dictate the spec directory name.
-
-   If the user explicitly provided `GIT_BRANCH_NAME`, pass it through to the hook so the branch script uses the exact value as the branch name (bypassing all prefix/suffix generation).
+2. **Branch creation (MANDATORY)**:
+   - Calculate the spec directory/branch name: `<prefix>-<short-name>` (e.g. `008-feature-name`, where `<prefix>` is the next available 3-digit number from `specs/`).
+   - The git branch name MUST be the exact name of the spec (e.g., `008-feature-name`).
+   - Create and switch to the new git branch:
+     ```bash
+     git checkout -b <spec-name>
+     ```
+     (If the branch already exists, switch to it with `git checkout <spec-name>`).
 
 3. **Create the spec feature directory**:
-
-   Specs live under the default `specs/` directory unless the user explicitly provides `SPECIFY_FEATURE_DIRECTORY`.
-
-   **Resolution order for `SPECIFY_FEATURE_DIRECTORY`**:
-   1. If the user explicitly provided `SPECIFY_FEATURE_DIRECTORY` (e.g., via environment variable, argument, or configuration), use it as-is
-   2. Otherwise, auto-generate it under `specs/`:
-      - Check `.specify/init-options.json` for `feature_numbering` (preferred) or `branch_numbering` (deprecated, migration only — will be removed in a future release)
-      - If `"timestamp"`: prefix is `YYYYMMDD-HHMMSS` (current timestamp)
-      - If `"sequential"` or absent: prefix is `NNN` (next available 3-digit number after scanning existing directories in `specs/`)
-      - Construct the directory name: `<prefix>-<short-name>` (e.g., `003-user-auth` or `20260319-143022-user-auth`)
-      - Set `SPECIFY_FEATURE_DIRECTORY` to `specs/<directory-name>`
-      - If `branch_numbering` was used (and `feature_numbering` was absent), emit a one-line warning: "⚠️ `branch_numbering` in init-options.json is deprecated. Rename to `feature_numbering`."
-
-   **Create the directory and spec file**:
-   - `mkdir -p SPECIFY_FEATURE_DIRECTORY`
-   - Resolve the active `spec-template` through the Spec Kit preset/template resolution stack (equivalent to `specify preset resolve spec-template`)
-   - Copy the resolved `spec-template` file to `SPECIFY_FEATURE_DIRECTORY/spec.md` as the starting point
-   - Set `SPEC_FILE` to `SPECIFY_FEATURE_DIRECTORY/spec.md`
-   - Persist the resolved path to `.specify/feature.json`:
+   - Set `SPECIFY_FEATURE_DIRECTORY` to `specs/<spec-name>` (matching the branch name).
+   - Create the directory: `mkdir -p specs/<spec-name>`
+   - Resolve active `spec-template` and copy to `specs/<spec-name>/spec.md`
+   - Set `SPEC_FILE` to `specs/<spec-name>/spec.md`
+   - Persist path to `.specify/feature.json`:
      ```json
      {
-       "feature_directory": "<resolved feature dir>"
+       "feature_directory": "specs/<spec-name>"
      }
      ```
-     Write the actual resolved directory path value (for example, `specs/003-user-auth`), not the literal string `SPECIFY_FEATURE_DIRECTORY`.
-     This allows downstream commands (`/speckit-plan`, `/speckit-tasks`, etc.) to locate the feature directory without relying on git branch name conventions.
-
-   **IMPORTANT**:
-   - You must only create one feature per `/speckit-specify` invocation
-   - The spec directory name and the git branch name are independent — they may be the same but that is the user's choice
-   - The spec directory and file are always created by this command, never by the hook
 
 4. Load the resolved active `spec-template` file to understand required sections.
 
@@ -267,15 +249,14 @@ Check if `.specify/extensions.yml` exists in the project root.
     To execute: `/{command}`
     ```
 
-## Completion Report
+## Completion Report & Next Steps
 
 Report completion to the user with:
-- `SPECIFY_FEATURE_DIRECTORY` — the feature directory path
-- `SPEC_FILE` — the spec file path
+- **Git Branch**: `<spec-name>` (created and checked out)
+- `SPECIFY_FEATURE_DIRECTORY` — the feature directory path (`specs/<spec-name>`)
+- `SPEC_FILE` — the spec file path (`specs/<spec-name>/spec.md`)
 - Checklist results summary
-- Readiness for the next phase (`/speckit-clarify` or `/speckit-plan`)
-
-**NOTE:** Branch creation is handled by the `before_specify` hook (git extension). Spec directory and file creation are always handled by this core command.
+- **MANDATORY**: Immediately initiate the `/grill-me` skill workflow to interview the user, grill them on edge cases, UX nuances, and architectural trade-offs, and refine the requirements before proceeding to `/speckit-plan`.
 
 ## Quick Guidelines
 
@@ -340,6 +321,8 @@ Success criteria must be:
 
 ## Done When
 
+- [ ] Dedicated Git branch named after the spec (`<spec-name>`) created and checked out
 - [ ] Specification written to `SPEC_FILE` and validated against quality checklist
+- [ ] Interactive alignment interview conducted via `/grill-me` before moving to planning
 - [ ] Extension hooks dispatched or skipped according to the rules in Mandatory Post-Execution Hooks above
-- [ ] Completion reported to user with feature directory, spec file path, and checklist results
+- [ ] Completion reported to user with feature directory, branch name, spec file path, and checklist results

@@ -77,14 +77,25 @@ All Gradle commands are executed directly from the project root (`madruga665-boo
 
 When implementing or modifying features, follow the SpecKit specification process:
 
-1. **Specify (`/speckit-specify`)**: Define feature spec in `specs/XXX-feature-name/spec.md`.
+1. **Specify (`/speckit-specify`)**:
+   - **Branch Creation**: Always creates and checks out a new Git branch named after the spec (e.g., `git checkout -b 008-feature-name`).
+   - **Spec Definition**: Defines feature spec in `specs/XXX-feature-name/spec.md` and generates quality checklist.
+   - **Alignment Interview**: **Always invokes `/grill-me`** immediately after `specify` to conduct an interactive interview with the user and resolve design/scope decisions before planning.
 2. **Plan (`/speckit-plan`)**: Outline technical design and data model changes in `specs/XXX-feature-name/plan.md`.
 3. **Tasks (`/speckit-tasks`)**: Break plan into actionable tasks in `specs/XXX-feature-name/tasks.md`.
 4. **Implement (`/speckit-implement`)**: Execute tasks and verify code against tests and specs. **Always delegate implementation tasks to subagents (`invoke_subagent`)**, keeping the main agent as the orchestrator for tracking progress, managing dependencies, and validating overall project criteria.
+5. **Code Review (`/code-reviewer`)**: **Always executed immediately after implementation**. The dedicated `code-reviewer` agent executes a mandatory dual-axis evaluation:
+   - **Standards Axis**: Verifies Domain-Driven Design (DDD - rich models, aggregate boundaries, layer independence), SOLID principles (SRP, OCP, LSP, ISP, DIP), Android Clean Architecture, Jetpack Compose Neobrutalism tokens (`ui/theme/Color.kt`), immutable `UiState` flows, Fowler code smells baseline, and unit test coverage.
+   - **Spec Axis**: Verifies full requirement coverage from `specs/XXX-feature-name/spec.md`, `plan.md`, and constitution compliance (`.specify/memory/constitution.md`), flagging any missing features or unrequested scope creep.
 
 ---
 
 ## 6. Coding & Architectural Standards
+
+### Domain-Driven Design (DDD) & SOLID Principles
+- **Domain Independence**: Pure Kotlin domain layer independent of Android SDK, UI, or persistence (Room/Retrofit) annotations.
+- **Rich Domain Models & Value Objects**: Encapsulate domain logic and invariants inside entities and value objects (e.g. `BookmarkUrl`, `TagId`), avoiding anemic models.
+- **SOLID Principles**: Adhere to Single Responsibility (focused classes), Open/Closed (extensible design), Liskov Substitution, Interface Segregation (lean contracts), and Dependency Inversion (high-level domain depends on abstractions).
 
 ### Clean Architecture & UI State
 - **UI Layer**: Composables must consume immutable `UiState` exposed by `ViewModel` via `StateFlow`.
