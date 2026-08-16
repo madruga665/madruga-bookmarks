@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App & Navigation -->
+    <string name="app_name">Bookmarks</string>
+    <string name="app_hero_title">Madruga Bookmarks</string>
+    <string name="settings_title">Settings</string>
+    <string name="back">Back</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_save">Save</string>
+    <string name="dialog_delete">Delete</string>
+    <string name="dialog_edit">Edit</string>
+    <string name="dialog_confirm">Confirm</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_apply">Apply</string>
+    <string name="dialog_select">Select</string>
+    <string name="paste_from_clipboard">Paste from clipboard</string>
+
+    <!-- Usage Hero Card -->
+    <string name="usage_total_links">Total Links</string>
+    <string name="usage_links_today">Links Today</string>
+    <string name="usage_collections">Collections</string>
+
+    <!-- Home -->
+    <string name="home_collections_heading">COLLECTIONS</string>
+    <string name="home_my_collections">My Collections</string>
+    <string name="home_quick_add_title">Quick Add</string>
+    <string name="home_quick_add_input_hint">Paste URL here to save...</string>
+    <string name="home_quick_save_placeholder">Paste link to quick save</string>
+    <string name="home_search_placeholder">Search bookmarks, tags...</string>
+    <string name="home_hero_headline">Save now.\nFind anytime.</string>
+    <string name="home_total_links">Total Links</string>
+    <string name="home_links_today">Links Today</string>
+    <string name="home_collections_count">Collections</string>
+    <string name="home_empty_collections">No collections yet</string>
+    <string name="home_create_first_collection">Create your first collection</string>
+    <string name="home_toast_clipboard_empty">Clipboard is empty</string>
+    <string name="home_toast_enter_valid_link">Please enter a valid link</string>
+    <string name="home_topbar_manage_collections">Manage Collections</string>
+    <string name="home_topbar_search">Search</string>
+    <string name="home_add_link">Add Link</string>
+
+    <!-- Save Modal -->
+    <string name="save_modal_title">Save to Bookmarks</string>
+    <string name="save_create_new_folder">Create New Folder</string>
+    <string name="save_create_new_collection">Create New Collection</string>
+    <string name="save_new_folder">Create new folder</string>
+    <string name="save_folder_name_hint">Folder name (e.g. Design)</string>
+    <string name="save_color_label">Color:</string>
+    <string name="save_create_folder_button">Create Folder</string>
+    <string name="save_pin_link">Pin this link</string>
+    <string name="save_bookmark_success">Bookmark saved successfully!</string>
+    <string name="save_pin_bookmark">Pin to top</string>
+    <string name="save_select_collection">Select Folder</string>
+    <string name="save_confirm_button">Save Bookmark</string>
+    <string name="save_to_collection_fmt">Save to \"%s\"</string>
+    <string name="save_unsorted">Unsorted</string>
+    <string name="save_err_empty_name">Folder name cannot be empty</string>
+    <string name="save_err_create_failed">Failed to create folder</string>
+    <string name="save_err_save_failed">Failed to save bookmark</string>
+
+    <!-- Collection Details -->
+    <string name="collection_all_links_fmt">ALL LINKS (%d)</string>
+    <string name="collection_pinned_fmt">PINNED (%d)</string>
+    <string name="collection_empty_title">No bookmarks yet</string>
+    <string name="collection_empty_desc">Save your first link to this collection</string>
+    <string name="collection_empty_add">Add Link</string>
+    <string name="collection_subtitle_fmt">%1$d links · %2$d subcollections</string>
+    <string name="collection_add_link_tooltip">Add Link</string>
+    <string name="collection_options_tooltip">Collection Options</string>
+    <string name="collection_links_count">%d links</string>
+
+    <!-- Collection Actions -->
+    <string name="collection_action_edit_short">EDIT</string>
+    <string name="collection_action_share_short">SHARE</string>
+    <string name="collection_action_delete_short">DELETE</string>
+    <string name="collection_actions_title">Collection Actions</string>
+    <string name="collection_action_edit">Edit Collection</string>
+    <string name="collection_action_delete">Delete Collection</string>
+    <string name="collection_action_share">Share Collection</string>
+    <string name="collection_action_export">Export Collection</string>
+    <string name="collection_delete_dialog_title">Delete Collection</string>
+    <string name="collection_delete_dialog_msg_fmt">Are you sure you want to delete \"%s\"?</string>
+    <string name="collection_delete_dialog_msg">This action will permanently delete this collection and all links inside it.</string>
+    <string name="collection_edit_dialog_title">Edit Collection</string>
+    <string name="collection_edit_name_label">Collection Name</string>
+    <string name="collection_edit_name_hint">Enter collection name</string>
+    <string name="collection_edit_color_label">Accent Color</string>
+    <string name="collection_edit_icon_label">Icon</string>
+    <string name="collection_edit_error_empty">Collection title cannot be empty</string>
+
+    <!-- Bookmark Details -->
+    <string name="bookmark_detail_title">Bookmark Details</string>
+    <string name="bookmark_untitled">Untitled</string>
+    <string name="bookmark_platform_link">LINK</string>
+    <string name="bookmark_btn_back">Back</string>
+    <string name="bookmark_btn_refresh">Refresh Metadata</string>
+    <string name="bookmark_btn_share">Share</string>
+    <string name="bookmark_btn_move">Move Collection</string>
+    <string name="bookmark_btn_delete">Delete</string>
+    <string name="bookmark_hero_image">Bookmark Hero Image</string>
+    <string name="bookmark_placeholder_image">Bookmark placeholder</string>
+    <string name="bookmark_pin">Pin</string>
+    <string name="bookmark_unpin">Unpin</string>
+    <string name="bookmark_edit_title_tooltip">Edit title</string>
+    <string name="bookmark_description_heading">DESCRIPTION</string>
+    <string name="bookmark_notes_heading">NOTES</string>
+    <string name="bookmark_notes_placeholder">Tap to add notes...</string>
+    <string name="bookmark_notes_editing_placeholder">Add your personal notes here...</string>
+    <string name="bookmark_tags_heading">TAGS</string>
+    <string name="bookmark_add_tag_button">Add</string>
+    <string name="bookmark_add_tag_dialog_title">Add Tag</string>
+    <string name="bookmark_add_tag_input_hint">Enter tag name...</string>
+    <string name="bookmark_add_tag_confirm">Add</string>
+    <string name="bookmark_remove_tag_desc_fmt">Remove tag %s</string>
+    <string name="bookmark_show_more">Show more</string>
+    <string name="bookmark_show_less">Show less</string>
+    <string name="bookmark_delete_dialog_title">Delete Bookmark?</string>
+    <string name="bookmark_delete_dialog_msg">Are you sure you want to delete this bookmark? This action cannot be undone.</string>
+    <string name="bookmark_move_sheet_title">Move to Folder</string>
+    <string name="bookmark_no_folders_available">No folders available</string>
+    <string name="bookmark_share_chooser_title">Share link</string>
+    <string name="bookmark_not_found">Bookmark not found</string>
+    <string name="bookmark_url_card_open">Open URL</string>
+    <string name="bookmark_url_error">Cannot open URL</string>
+    <string name="bookmark_url_error_fmt">Could not open URL: %s</string>
+    <string name="bookmark_share_error">Could not share link</string>
+    <string name="bookmark_toast_invalid_id">Invalid bookmark ID</string>
+    <string name="bookmark_toast_title_empty">Title cannot be empty</string>
+    <string name="bookmark_toast_metadata_refresh_failed">Failed to refresh metadata</string>
+    <string name="bookmark_toast_metadata_updated">Metadata updated!</string>
+
+    <!-- Settings -->
+    <string name="section_preferences">PREFERENCES</string>
+    <string name="pref_theme_title">Theme</string>
+    <string name="pref_theme_desc">Change app color theme</string>
+    <string name="pref_language_title">Language</string>
+    <string name="pref_language_desc">Change app display language</string>
+    <string name="pref_haptic_title">Haptic Feedback</string>
+    <string name="pref_haptic_desc">Vibrate for actions and selections</string>
+    <string name="theme_select_title">Select Theme</string>
+    <string name="theme_system">System Default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Catppuccin Mocha Dark</string>
+    <string name="lang_select_title">Select Language</string>
+    <string name="lang_system">System Default</string>
+    <string name="lang_en">English</string>
+    <string name="lang_pt_br">Português (Brasil)</string>
+    <string name="section_your_data">YOUR DATA</string>
+    <string name="action_export_backup">Export Backup</string>
+    <string name="action_export_backup_desc">Export all bookmarks and collections</string>
+    <string name="action_restore_backup">Restore Backup</string>
+    <string name="action_restore_backup_desc">Restore from a backup file</string>
+    <string name="section_import">IMPORT FROM OTHER APPS</string>
+    <string name="action_import_bookmarks">Import Bookmarks</string>
+    <string name="action_import_bookmarks_desc">Import from browser or HTML file</string>
+    <string name="section_about">ABOUT</string>
+    <string name="about_version">Version</string>
+    <string name="toast_exporting_backup">Exporting backup...</string>
+    <string name="toast_restore_backup_soon">Restore Backup feature coming soon</string>
+    <string name="toast_import_bookmarks_soon">Import Bookmarks feature coming soon</string>
+</resources>

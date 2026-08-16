@@ -1,0 +1,265 @@
+package com.madruga665.bookmarks.ui.navigation
+
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.madruga665.bookmarks.R
+import com.madruga665.bookmarks.data.repository.BookmarkRepository
+import com.madruga665.bookmarks.data.repository.CollectionRepository
+import com.madruga665.bookmarks.data.repository.SettingsRepository
+import com.madruga665.bookmarks.ui.bookmark.BookmarkDetailScreen
+import com.madruga665.bookmarks.ui.bookmark.BookmarkDetailViewModel
+import com.madruga665.bookmarks.ui.bookmark.openBrowserUrl
+import com.madruga665.bookmarks.ui.bookmark.shareBookmark
+import com.madruga665.bookmarks.ui.collection.CollectionDetailScreen
+import com.madruga665.bookmarks.ui.collection.CollectionDetailViewModel
+import com.madruga665.bookmarks.ui.home.HomeScreen
+import com.madruga665.bookmarks.ui.home.HomeViewModel
+import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkBottomSheet
+import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkViewModel
+import com.madruga665.bookmarks.ui.settings.SettingsScreen
+import com.madruga665.bookmarks.ui.settings.SettingsViewModel
+import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
+import androidx.lifecycle.SavedStateHandle
+
+object NavRoutes {
+    const val HOME = "home"
+    const val SEARCH = "search"
+    const val SETTINGS = "settings"
+    const val MANAGE_COLLECTIONS = "manage_collections"
+    const val FOLDER_DETAIL = "folder_detail/{folderId}"
+    const val BOOKMARK_DETAIL = "bookmark_detail/{bookmarkId}"
+
+    fun folderDetail(folderId: String) = "folder_detail/$folderId"
+    fun bookmarkDetail(bookmarkId: String) = "bookmark_detail/$bookmarkId"
+}
+
+@Composable
+fun BookmarksNavGraph(
+    homeViewModel: HomeViewModel,
+    saveBookmarkViewModel: SaveBookmarkViewModel,
+    collectionRepository: CollectionRepository,
+    bookmarkRepository: BookmarkRepository,
+    settingsRepository: SettingsRepository,
+    navController: NavHostController = rememberNavController()
+) {
+    val uiState by homeViewModel.uiState.collectAsState()
+
+    NavHost(
+        navController = navController,
+        startDestination = NavRoutes.HOME
+    ) {
+        composable(NavRoutes.HOME) {
+            val context = LocalContext.current
+            HomeScreen(
+                uiState = uiState,
+                saveBookmarkViewModel = saveBookmarkViewModel,
+                onUrlInputChange = homeViewModel::onUrlInputChange,
+                onPasteFromClipboard = homeViewModel::onPasteFromClipboard,
+                onCollectionClick = { collectionId ->
+                    navController.navigate(NavRoutes.folderDetail(collectionId))
+                },
+                onCollectionLongClick = homeViewModel::openActionsMenu,
+                onLongPressStart = homeViewModel::onLongPressStart,
+                onLongPressDrag = homeViewModel::onLongPressDrag,
+                onLongPressRelease = {
+                    homeViewModel.onLongPressRelease { collection ->
+                        homeViewModel.shareCollection(context, collection)
+                    }
+                },
+                onHoveredOptionChange = homeViewModel::onHoveredOptionChange,
+                onDismissActionsMenu = homeViewModel::dismissActionsMenu,
+                onEditCollectionClick = homeViewModel::openEditDialog,
+                onShareCollectionClick = { collection ->
+                    homeViewModel.shareCollection(context, collection)
+                },
+                onDeleteCollectionClick = homeViewModel::openDeleteDialog,
+                onDismissEditDialog = homeViewModel::dismissEditDialog,
+                onConfirmEditCollection = homeViewModel::updateCollection,
+                onDismissDeleteDialog = homeViewModel::dismissDeleteDialog,
+                onConfirmDeleteCollection = homeViewModel::deleteCollection,
+                onNavigateToSearch = {
+                    navController.navigate(NavRoutes.SEARCH)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(NavRoutes.SETTINGS)
+                },
+                onNavigateToManageCollections = {
+                    navController.navigate(NavRoutes.MANAGE_COLLECTIONS)
+                }
+            )
+        }
+
+        composable(NavRoutes.SEARCH) {
+            PlaceholderDestination(title = "Search Screen")
+        }
+
+        composable(NavRoutes.SETTINGS) {
+            val context = LocalContext.current
+            val settingsViewModel = remember {
+                SettingsViewModel(
+                    settingsRepository = settingsRepository,
+                    bookmarkRepository = bookmarkRepository,
+                    collectionRepository = collectionRepository
+                )
+            }
+            val settingsUiState by settingsViewModel.uiState.collectAsState()
+
+            SettingsScreen(
+                uiState = settingsUiState,
+                onBackClick = { navController.popBackStack() },
+                onThemeSelect = settingsViewModel::setThemeMode,
+                onLanguageSelect = settingsViewModel::setLanguage,
+                onToggleHapticFeedback = settingsViewModel::toggleHapticFeedback,
+                onExportBackupClick = {
+                    Toast.makeText(context, context.getString(R.string.toast_exporting_backup), Toast.LENGTH_SHORT).show()
+                },
+                onRestoreBackupClick = {
+                    Toast.makeText(context, context.getString(R.string.toast_restore_backup_soon), Toast.LENGTH_SHORT).show()
+                },
+                onImportBookmarksClick = {
+                    Toast.makeText(context, context.getString(R.string.toast_import_bookmarks_soon), Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+
+        composable(NavRoutes.MANAGE_COLLECTIONS) {
+            PlaceholderDestination(title = "Manage Collections Screen")
+        }
+
+        composable(NavRoutes.FOLDER_DETAIL) { backStackEntry ->
+            val context = LocalContext.current
+            val folderId = backStackEntry.arguments?.getString("folderId") ?: ""
+            val viewModel = remember(folderId) {
+                CollectionDetailViewModel(
+                    collectionId = folderId,
+                    collectionRepository = collectionRepository,
+                    bookmarkRepository = bookmarkRepository
+                )
+            }
+            val detailUiState by viewModel.uiState.collectAsState()
+            val saveModalUiState by saveBookmarkViewModel.uiState.collectAsState()
+
+            CollectionDetailScreen(
+                uiState = detailUiState,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onAddLinkClick = {
+                    saveBookmarkViewModel.openSaveModal("https://")
+                    saveBookmarkViewModel.onSelectCollection(folderId)
+                },
+                onOptionsClick = {
+                    // Options click handler
+                },
+                onBookmarkClick = { bookmark ->
+                    navController.navigate(NavRoutes.bookmarkDetail(bookmark.id))
+                },
+                onSubcollectionClick = { subcollectionId ->
+                    navController.navigate(NavRoutes.folderDetail(subcollectionId))
+                }
+            )
+
+            SaveBookmarkBottomSheet(
+                uiState = saveModalUiState,
+                onCollectionSelect = saveBookmarkViewModel::onSelectCollection,
+                onTogglePin = saveBookmarkViewModel::onTogglePin,
+                onToggleCreateFolder = saveBookmarkViewModel::onToggleCreateFolder,
+                onNewFolderNameChange = saveBookmarkViewModel::onNewFolderNameChange,
+                onNewFolderColorSelect = saveBookmarkViewModel::onNewFolderColorSelect,
+                onCreateFolderSubmit = saveBookmarkViewModel::onCreateFolderSubmit,
+                onConfirmSave = {
+                    saveBookmarkViewModel.onConfirmSave {
+                        Toast.makeText(context, context.getString(R.string.save_bookmark_success), Toast.LENGTH_SHORT).show()
+                    }
+                },
+                onDismiss = saveBookmarkViewModel::dismissModal
+            )
+        }
+
+        composable(NavRoutes.BOOKMARK_DETAIL) { backStackEntry ->
+            val context = LocalContext.current
+            val bookmarkId = backStackEntry.arguments?.getString("bookmarkId") ?: ""
+            val bookmarkDetailViewModel = remember(bookmarkId) {
+                BookmarkDetailViewModel(
+                    bookmarkRepository = bookmarkRepository,
+                    collectionRepository = collectionRepository,
+                    savedStateHandle = SavedStateHandle(mapOf("bookmarkId" to bookmarkId))
+                )
+            }
+            val bookmarkUiState by bookmarkDetailViewModel.uiState.collectAsState()
+
+            BookmarkDetailScreen(
+                uiState = bookmarkUiState,
+                onBackClick = { navController.popBackStack() },
+                onRefreshClick = bookmarkDetailViewModel::onRefreshMetadata,
+                onShareClick = {
+                    bookmarkUiState.bookmark?.let { bm ->
+                        shareBookmark(context, bm.title, bm.url)
+                    }
+                },
+                onMoveClick = bookmarkDetailViewModel::onOpenMoveCollectionSheet,
+                onDeleteClick = bookmarkDetailViewModel::onOpenDeleteDialog,
+                onTogglePin = bookmarkDetailViewModel::onTogglePin,
+                onStartEditingTitle = bookmarkDetailViewModel::onStartEditingTitle,
+                onTitleChange = bookmarkDetailViewModel::onTitleChange,
+                onSaveTitle = bookmarkDetailViewModel::onSaveTitle,
+                onCancelEditingTitle = bookmarkDetailViewModel::onCancelEditingTitle,
+                onUrlClick = { url -> openBrowserUrl(context, url) },
+                onToggleDescriptionExpanded = bookmarkDetailViewModel::onToggleDescriptionExpanded,
+                onStartEditingNotes = bookmarkDetailViewModel::onStartEditingNotes,
+                onNotesChange = bookmarkDetailViewModel::onNotesChange,
+                onSaveNotes = bookmarkDetailViewModel::onSaveNotes,
+                onCancelEditingNotes = bookmarkDetailViewModel::onCancelEditingNotes,
+                onOpenAddTagDialog = bookmarkDetailViewModel::onOpenAddTagDialog,
+                onNewTagInputChange = bookmarkDetailViewModel::onNewTagInputChange,
+                onSaveNewTag = bookmarkDetailViewModel::onSaveNewTag,
+                onDismissAddTagDialog = bookmarkDetailViewModel::onDismissAddTagDialog,
+                onRemoveTag = bookmarkDetailViewModel::onRemoveTag,
+                onOpenMoveCollectionSheet = bookmarkDetailViewModel::onOpenMoveCollectionSheet,
+                onDismissMoveCollectionSheet = bookmarkDetailViewModel::onDismissMoveCollectionSheet,
+                onSelectCollection = bookmarkDetailViewModel::onSelectCollection,
+                onOpenDeleteDialog = bookmarkDetailViewModel::onOpenDeleteDialog,
+                onDismissDeleteDialog = bookmarkDetailViewModel::onDismissDeleteDialog,
+                onConfirmDelete = {
+                    bookmarkDetailViewModel.onConfirmDelete {
+                        navController.popBackStack()
+                    }
+                },
+                onClearUserMessage = bookmarkDetailViewModel::clearUserMessage
+            )
+        }
+    }
+}
+
+@Composable
+private fun PlaceholderDestination(title: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(NeobrutalismTheme.colors.background),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = title,
+            style = NeobrutalismTheme.typography.headlineMedium,
+            color = NeobrutalismTheme.colors.onSurface
+        )
+    }
+}
+

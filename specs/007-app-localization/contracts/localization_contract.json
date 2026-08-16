@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AppLocalizationContract",
+  "description": "Contract for language preferences and dynamic locale configuration",
+  "type": "object",
+  "properties": {
+    "supportedLanguages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string", "enum": ["system", "en", "pt-BR"] },
+          "enumName": { "type": "string", "enum": ["SYSTEM", "EN", "PT_BR"] },
+          "labelResource": { "type": "string" }
+        },
+        "required": ["code", "enumName", "labelResource"]
+      }
+    },
+    "preferenceKey": {
+      "type": "string",
+      "example": "app_language"
+    }
+  },
+  "required": ["supportedLanguages", "preferenceKey"]
+}

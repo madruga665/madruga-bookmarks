@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App & Navigation -->
+    <string name="app_name">Bookmarks</string>
+    <string name="app_hero_title">Madruga Bookmarks</string>
+    <string name="settings_title">Configurações</string>
+    <string name="back">Voltar</string>
+    <string name="dialog_cancel">Cancelar</string>
+    <string name="dialog_save">Salvar</string>
+    <string name="dialog_delete">Excluir</string>
+    <string name="dialog_edit">Editar</string>
+    <string name="dialog_confirm">Confirmar</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_apply">Aplicar</string>
+    <string name="dialog_select">Selecionar</string>
+    <string name="paste_from_clipboard">Colar da área de transferência</string>
+
+    <!-- Usage Hero Card -->
+    <string name="usage_total_links">Total de Links</string>
+    <string name="usage_links_today">Links Hoje</string>
+    <string name="usage_collections">Coleções</string>
+
+    <!-- Home -->
+    <string name="home_collections_heading">COLEÇÕES</string>
+    <string name="home_my_collections">Minhas Coleções</string>
+    <string name="home_quick_add_title">Adicionar Rápido</string>
+    <string name="home_quick_add_input_hint">Cole a URL aqui para salvar...</string>
+    <string name="home_quick_save_placeholder">Cole o link para salvar rápido</string>
+    <string name="home_search_placeholder">Buscar links, tags...</string>
+    <string name="home_hero_headline">Salve agora.\nEncontre sempre.</string>
+    <string name="home_total_links">Total de Links</string>
+    <string name="home_links_today">Links Hoje</string>
+    <string name="home_collections_count">Coleções</string>
+    <string name="home_empty_collections">Nenhuma coleção ainda</string>
+    <string name="home_create_first_collection">Crie sua primeira coleção</string>
+    <string name="home_toast_clipboard_empty">A área de transferência está vazia</string>
+    <string name="home_toast_enter_valid_link">Por favor, insira um link válido</string>
+    <string name="home_topbar_manage_collections">Gerenciar Coleções</string>
+    <string name="home_topbar_search">Buscar</string>
+    <string name="home_add_link">Adicionar Link</string>
+
+    <!-- Save Modal -->
+    <string name="save_modal_title">Salvar nos Bookmarks</string>
+    <string name="save_create_new_folder">Criar Nova Pasta</string>
+    <string name="save_create_new_collection">Criar Nova Coleção</string>
+    <string name="save_new_folder">Criar nova pasta</string>
+    <string name="save_folder_name_hint">Nome da pasta (ex: Design)</string>
+    <string name="save_color_label">Cor:</string>
+    <string name="save_create_folder_button">Criar Pasta</string>
+    <string name="save_pin_link">Fixar este link</string>
+    <string name="save_bookmark_success">Bookmark salvo com sucesso!</string>
+    <string name="save_pin_bookmark">Fixar no topo</string>
+    <string name="save_select_collection">Selecionar Pasta</string>
+    <string name="save_confirm_button">Salvar Bookmark</string>
+    <string name="save_to_collection_fmt">Salvar em \"%s\"</string>
+    <string name="save_unsorted">Sem pasta</string>
+    <string name="save_err_empty_name">O nome da pasta não pode ser vazio</string>
+    <string name="save_err_create_failed">Falha ao criar pasta</string>
+    <string name="save_err_save_failed">Falha ao salvar bookmark</string>
+
+    <!-- Collection Details -->
+    <string name="collection_all_links_fmt">TODOS OS LINKS (%d)</string>
+    <string name="collection_pinned_fmt">FIXADOS (%d)</string>
+    <string name="collection_empty_title">Nenhum bookmark ainda</string>
+    <string name="collection_empty_desc">Salve seu primeiro link nesta coleção</string>
+    <string name="collection_empty_add">Adicionar Link</string>
+    <string name="collection_subtitle_fmt">%1$d links · %2$d subcoleções</string>
+    <string name="collection_add_link_tooltip">Adicionar Link</string>
+    <string name="collection_options_tooltip">Opções da Coleção</string>
+    <string name="collection_links_count">%d links</string>
+
+    <!-- Collection Actions -->
+    <string name="collection_action_edit_short">EDITAR</string>
+    <string name="collection_action_share_short">COMPARTILHAR</string>
+    <string name="collection_action_delete_short">EXCLUIR</string>
+    <string name="collection_actions_title">Ações da Coleção</string>
+    <string name="collection_action_edit">Editar Coleção</string>
+    <string name="collection_action_delete">Excluir Coleção</string>
+    <string name="collection_action_share">Compartilhar Coleção</string>
+    <string name="collection_action_export">Exportar Coleção</string>
+    <string name="collection_delete_dialog_title">Excluir Coleção</string>
+    <string name="collection_delete_dialog_msg_fmt">Tem certeza de que deseja excluir \"%s\"?</string>
+    <string name="collection_delete_dialog_msg">Esta ação excluirá permanentemente esta coleção e todos os links dentro dela.</string>
+    <string name="collection_edit_dialog_title">Editar Coleção</string>
+    <string name="collection_edit_name_label">Nome da Coleção</string>
+    <string name="collection_edit_name_hint">Digite o nome da coleção</string>
+    <string name="collection_edit_color_label">Cor de Destaque</string>
+    <string name="collection_edit_icon_label">Ícone</string>
+    <string name="collection_edit_error_empty">O título da coleção não pode ser vazio</string>
+
+    <!-- Bookmark Details -->
+    <string name="bookmark_detail_title">Detalhes do Bookmark</string>
+    <string name="bookmark_untitled">Sem título</string>
+    <string name="bookmark_platform_link">LINK</string>
+    <string name="bookmark_btn_back">Voltar</string>
+    <string name="bookmark_btn_refresh">Atualizar Metadados</string>
+    <string name="bookmark_btn_share">Compartilhar</string>
+    <string name="bookmark_btn_move">Mover Coleção</string>
+    <string name="bookmark_btn_delete">Excluir</string>
+    <string name="bookmark_hero_image">Imagem do Bookmark</string>
+    <string name="bookmark_placeholder_image">Imagem padrão</string>
+    <string name="bookmark_pin">Fixar</string>
+    <string name="bookmark_unpin">Desafixar</string>
+    <string name="bookmark_edit_title_tooltip">Editar título</string>
+    <string name="bookmark_description_heading">DESCRIÇÃO</string>
+    <string name="bookmark_notes_heading">NOTAS</string>
+    <string name="bookmark_notes_placeholder">Toque para adicionar notas...</string>
+    <string name="bookmark_notes_editing_placeholder">Adicione suas notas pessoais aqui...</string>
+    <string name="bookmark_tags_heading">TAGS</string>
+    <string name="bookmark_add_tag_button">Adicionar</string>
+    <string name="bookmark_add_tag_dialog_title">Adicionar Tag</string>
+    <string name="bookmark_add_tag_input_hint">Digite o nome da tag...</string>
+    <string name="bookmark_add_tag_confirm">Adicionar</string>
+    <string name="bookmark_remove_tag_desc_fmt">Remover tag %s</string>
+    <string name="bookmark_show_more">Mostrar mais</string>
+    <string name="bookmark_show_less">Mostrar menos</string>
+    <string name="bookmark_delete_dialog_title">Excluir Bookmark?</string>
+    <string name="bookmark_delete_dialog_msg">Tem certeza de que deseja excluir este bookmark? Esta ação não pode ser desfeita.</string>
+    <string name="bookmark_move_sheet_title">Mover para Pasta</string>
+    <string name="bookmark_no_folders_available">Nenhuma pasta disponível</string>
+    <string name="bookmark_share_chooser_title">Compartilhar link</string>
+    <string name="bookmark_not_found">Bookmark não encontrado</string>
+    <string name="bookmark_url_card_open">Abrir URL</string>
+    <string name="bookmark_url_error">Não foi possível abrir o link</string>
+    <string name="bookmark_url_error_fmt">Não foi possível abrir o link: %s</string>
+    <string name="bookmark_share_error">Não foi possível compartilhar o link</string>
+    <string name="bookmark_toast_invalid_id">ID de bookmark inválido</string>
+    <string name="bookmark_toast_title_empty">O título não pode ser vazio</string>
+    <string name="bookmark_toast_metadata_refresh_failed">Falha ao atualizar metadados</string>
+    <string name="bookmark_toast_metadata_updated">Metadados atualizados!</string>
+
+    <!-- Settings -->
+    <string name="section_preferences">PREFERÊNCIAS</string>
+    <string name="pref_theme_title">Tema</string>
+    <string name="pref_theme_desc">Alterar tema de cores do aplicativo</string>
+    <string name="pref_language_title">Idioma</string>
+    <string name="pref_language_desc">Alterar idioma de exibição do aplicativo</string>
+    <string name="pref_haptic_title">Feedback Tátil</string>
+    <string name="pref_haptic_desc">Vibrar para ações e seleções</string>
+    <string name="theme_select_title">Selecionar Tema</string>
+    <string name="theme_system">Padrão do Sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Catppuccin Mocha Escuro</string>
+    <string name="lang_select_title">Selecionar Idioma</string>
+    <string name="lang_system">Padrão do Sistema</string>
+    <string name="lang_en">English</string>
+    <string name="lang_pt_br">Português (Brasil)</string>
+    <string name="section_your_data">SEUS DADOS</string>
+    <string name="action_export_backup">Exportar Backup</string>
+    <string name="action_export_backup_desc">Exportar todos os favoritos e coleções</string>
+    <string name="action_restore_backup">Restaurar Backup</string>
+    <string name="action_restore_backup_desc">Restaurar a partir de um arquivo de backup</string>
+    <string name="section_import">IMPORTAR DE OUTROS APPS</string>
+    <string name="action_import_bookmarks">Importar Favoritos</string>
+    <string name="action_import_bookmarks_desc">Importar do navegador ou arquivo HTML</string>
+    <string name="section_about">SOBRE</string>
+    <string name="about_version">Versão</string>
+    <string name="toast_exporting_backup">Exportando backup...</string>
+    <string name="toast_restore_backup_soon">Recurso de restaurar backup em breve</string>
+    <string name="toast_import_bookmarks_soon">Recurso de importar favoritos em breve</string>
+</resources>
