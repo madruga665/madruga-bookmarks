@@ -24,8 +24,8 @@ import com.madruga665.bookmarks.data.repository.CollectionRepository
 import com.madruga665.bookmarks.data.repository.SettingsRepository
 import com.madruga665.bookmarks.ui.bookmark.BookmarkDetailScreen
 import com.madruga665.bookmarks.ui.bookmark.BookmarkDetailViewModel
-import com.madruga665.bookmarks.ui.bookmark.openBrowserUrl
-import com.madruga665.bookmarks.ui.bookmark.shareBookmark
+import com.madruga665.bookmarks.ui.utils.ShareUtils
+import com.madruga665.bookmarks.ui.utils.UrlUtils
 import com.madruga665.bookmarks.ui.collection.CollectionDetailScreen
 import com.madruga665.bookmarks.ui.collection.CollectionDetailViewModel
 import com.madruga665.bookmarks.ui.home.HomeScreen
@@ -210,7 +210,7 @@ fun BookmarksNavGraph(
                 onRefreshClick = bookmarkDetailViewModel::onRefreshMetadata,
                 onShareClick = {
                     bookmarkUiState.bookmark?.let { bm ->
-                        shareBookmark(context, bm.title, bm.url)
+                        ShareUtils.shareBookmark(context, bm.title, bm.url)
                     }
                 },
                 onMoveClick = bookmarkDetailViewModel::onOpenMoveCollectionSheet,
@@ -220,7 +220,7 @@ fun BookmarksNavGraph(
                 onTitleChange = bookmarkDetailViewModel::onTitleChange,
                 onSaveTitle = bookmarkDetailViewModel::onSaveTitle,
                 onCancelEditingTitle = bookmarkDetailViewModel::onCancelEditingTitle,
-                onUrlClick = { url -> openBrowserUrl(context, url) },
+                onUrlClick = { url -> UrlUtils.openBrowserUrl(context, url) },
                 onToggleDescriptionExpanded = bookmarkDetailViewModel::onToggleDescriptionExpanded,
                 onStartEditingNotes = bookmarkDetailViewModel::onStartEditingNotes,
                 onNotesChange = bookmarkDetailViewModel::onNotesChange,

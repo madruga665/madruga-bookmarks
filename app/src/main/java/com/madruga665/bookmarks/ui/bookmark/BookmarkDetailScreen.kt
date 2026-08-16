@@ -142,7 +142,8 @@ fun BookmarkDetailScreen(
                         thumbnailUrl = bookmark.thumbnailUrl,
                         url = bookmark.url,
                         isPinned = bookmark.isPinned,
-                        onTogglePin = onTogglePin
+                        onTogglePin = onTogglePin,
+                        onUrlClick = onUrlClick
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -231,23 +232,9 @@ fun BookmarkDetailScreen(
 }
 
 fun shareBookmark(context: Context, title: String?, url: String) {
-    try {
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, title ?: context.getString(R.string.app_name))
-            putExtra(Intent.EXTRA_TEXT, if (!title.isNullOrBlank()) "$title\n$url" else url)
-        }
-        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.bookmark_share_chooser_title)))
-    } catch (e: Exception) {
-        Toast.makeText(context, context.getString(R.string.bookmark_share_error), Toast.LENGTH_SHORT).show()
-    }
+    com.madruga665.bookmarks.ui.utils.ShareUtils.shareBookmark(context, title, url)
 }
 
 fun openBrowserUrl(context: Context, url: String) {
-    try {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        context.startActivity(intent)
-    } catch (e: Exception) {
-        Toast.makeText(context, context.getString(R.string.bookmark_url_error_fmt, url), Toast.LENGTH_SHORT).show()
-    }
+    com.madruga665.bookmarks.ui.utils.UrlUtils.openBrowserUrl(context, url)
 }

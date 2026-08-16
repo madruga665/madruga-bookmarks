@@ -27,6 +27,8 @@ import com.madruga665.bookmarks.ui.components.NeobrutalistButton
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 import com.madruga665.bookmarks.ui.theme.neobrutalistShadow
 
+import androidx.compose.foundation.clickable
+
 @Composable
 fun BookmarkHeroSection(
     thumbnailUrl: String?,
@@ -34,6 +36,7 @@ fun BookmarkHeroSection(
     isPinned: Boolean,
     onTogglePin: () -> Unit,
     modifier: Modifier = Modifier,
+    onUrlClick: ((String) -> Unit)? = null,
     accentColor: Color = NeobrutalismTheme.colors.accentYellow
 ) {
     val displayThumbnail = when {
@@ -56,7 +59,14 @@ fun BookmarkHeroSection(
                 color = accentColor.copy(alpha = 0.2f),
                 shape = RoundedCornerShape(16.dp)
             )
-            .clip(RoundedCornerShape(16.dp)),
+            .clip(RoundedCornerShape(16.dp))
+            .then(
+                if (onUrlClick != null) {
+                    Modifier.clickable { onUrlClick(url) }
+                } else {
+                    Modifier
+                }
+            ),
         contentAlignment = Alignment.Center
     ) {
         if (!displayThumbnail.isNullOrBlank()) {
