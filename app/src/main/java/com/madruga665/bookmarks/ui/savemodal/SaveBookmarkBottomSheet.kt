@@ -38,6 +38,7 @@ import com.madruga665.bookmarks.R
 import com.madruga665.bookmarks.ui.collection.create.CreateCollectionBottomSheet
 import com.madruga665.bookmarks.ui.components.NeobrutalistButton
 import com.madruga665.bookmarks.ui.components.NeobrutalistSelectableFolderCard
+import com.madruga665.bookmarks.ui.components.NeobrutalistTagInput
 import com.madruga665.bookmarks.ui.savemodal.components.InlineCreateFolderForm
 import com.madruga665.bookmarks.ui.savemodal.components.PinLinkToggleRow
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
@@ -56,6 +57,9 @@ fun SaveBookmarkBottomSheet(
     onConfirmSave: () -> Unit,
     onDismiss: () -> Unit,
     collectionRepository: CollectionRepository? = null,
+    onTagInputChange: (String) -> Unit = {},
+    onAddTag: (String) -> Unit = {},
+    onRemoveTag: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     if (!uiState.isVisible) return
@@ -138,7 +142,18 @@ fun SaveBookmarkBottomSheet(
                 onTogglePin = onTogglePin
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Tag Input Section
+            NeobrutalistTagInput(
+                tags = uiState.tags,
+                tagInput = uiState.tagInput,
+                onTagInputChange = onTagInputChange,
+                onAddTag = onAddTag,
+                onRemoveTag = onRemoveTag,
+                existingTags = uiState.existingTags,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
 
             // Inline Create Folder Form (If active)
             if (uiState.isCreatingFolder) {

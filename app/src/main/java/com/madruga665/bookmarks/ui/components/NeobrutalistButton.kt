@@ -42,12 +42,12 @@ fun NeobrutalistButton(
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val currentShadowOffset by animateDpAsState(
-        targetValue = if (enabled && isPressed) 1.dp else if (!enabled) 0.dp else shadowOffset,
+        targetValue = if (isPressed && enabled) 1.dp else if (!enabled) 0.dp else shadowOffset,
         label = "pressShadowOffset"
     )
 
     val currentContentOffset by animateDpAsState(
-        targetValue = if (enabled && isPressed) (shadowOffset - 1.dp) else 0.dp,
+        targetValue = if (isPressed && enabled) (shadowOffset - 1.dp) else 0.dp,
         label = "pressContentOffset"
     )
 
@@ -57,8 +57,8 @@ fun NeobrutalistButton(
         modifier = modifier
             .offset(x = currentContentOffset, y = currentContentOffset)
             .neobrutalistShadow(
-                shadowColor = if (enabled) shadowColor else Color.Transparent,
-                borderColor = borderColor,
+                shadowColor = if (enabled) shadowColor else shadowColor.copy(alpha = 0.3f),
+                borderColor = if (enabled) borderColor else borderColor.copy(alpha = 0.5f),
                 borderWidth = borderWidth,
                 shadowOffset = currentShadowOffset,
                 shape = shape

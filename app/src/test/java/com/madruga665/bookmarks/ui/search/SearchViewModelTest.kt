@@ -424,4 +424,142 @@ class SearchViewModelTest {
         assertEquals("Artificial Intelligence", state.collectionsMap["col_ia"]?.name)
         assertEquals("Design Inspiration", state.collectionsMap["col_design"]?.name)
     }
+
+    // ---- Tag filtering tests (T011) ----
+
+    @Test
+    fun `available tags are extracted and sorted by count descending`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        // bookmark1 tags: "AI, LLM, Research", bookmark2 tags: "Code, Kotlin, Android"
+        // bookmark3 tags: "Design, UI, Brutalism"
+        val extraBm = bookmark1.copy(id = "bm_extra", tags = "AI, Kotlin")
+        collectionsFlow.value = listOf(collection1, collection2)
+        bookmarksFlow.value = listOf(bookmark1, bookmark2, bookmark3, extraBm)
+
+        val state = viewModel.uiState.value
+        val tags = state.availableTags
+        // "ai" appears in bookmark1 + extraBm = count 2
+        // "kotlin" appears in bookmark2 + extraBm = count 2
+        assertTrue(tags.isNotEmpty())
+        // The first tags should have count 2
+        val topTags = tags.filter { it.count == 2 }.map { it.name }
+        assertTrue(topTags.contains("ai"))
+        assertTrue(topTags.contains("kotlin"))
+    }
+
+    @Test
+    fun `toggle tag filter shows only matching bookmarks`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        collectionsFlow.value = listOf(collection1, collection2)
+        bookmarksFlow.value = listOf(bookmark1, bookmark2, bookmark3)
+
+        // Filter by "ai" -> only bookmark1 (tags: "AI, LLM, Research")
+        viewModel.onToggleTagFilter("ai")
+
+        val state = viewModel.uiState.value
+        assertTrue(state.isSearching)
+        assertEquals(1, state.searchResults.size)
+        assertEquals("bm_1", state.searchResults.first().id)
+        assertTrue(state.selectedTags.contains("ai"))
+    }
+
+    @Test
+    fun `toggle same tag twice deselects it`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        collectionsFlow.value = listOf(collection1)
+        bookmarksFlow.value = listOf(bookmark1)
+
+        viewModel.onToggleTagFilter("ai")
+        assertTrue(viewModel.uiState.value.selectedTags.contains("ai"))
+
+        viewModel.onToggleTagFilter("ai")
+        assertTrue(viewModel.uiState.value.selectedTags.isEmpty())
+        assertFalse(viewModel.uiState.value.isSearching)
+    }
+
+    @Test
+    fun `multiple tag filters use AND intersection`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        // Create bookmark that has both "ai" and "kotlin"
+        val bmBoth = bookmark1.copy(id = "bm_both", tags = "AI, Kotlin, Research")
+        collectionsFlow.value = listOf(collection1)
+        bookmarksFlow.value = listOf(bookmark1, bookmark2, bmBoth)
+
+        viewModel.onToggleTagFilter("ai")
+        viewModel.onToggleTagFilter("kotlin")
+
+        val state = viewModel.uiState.value
+        // Only bmBoth has both "ai" AND "kotlin"
+        assertEquals(1, state.searchResults.size)
+        assertEquals("bm_both", state.searchResults.first().id)
+    }
+
+    @Test
+    fun `combined text query and tag filter narrows results`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        val bmAiGithub = bookmark2.copy(id = "bm_ai_gh", tags = "AI, Code")
+        collectionsFlow.value = listOf(collection1)
+        bookmarksFlow.value = listOf(bookmark1, bmAiGithub)
+
+        // Filter by tag "ai" -> both match
+        viewModel.onToggleTagFilter("ai")
+        assertEquals(2, viewModel.uiState.value.searchResults.size)
+
+        // Add text query "github" -> only bmAiGithub matches both
+        viewModel.onQueryChange("github")
+        val state = viewModel.uiState.value
+        assertEquals(1, state.searchResults.size)
+        assertEquals("bm_ai_gh", state.searchResults.first().id)
+    }
+
+    @Test
+    fun `clear tag filters removes all selected tags`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        collectionsFlow.value = listOf(collection1)
+        bookmarksFlow.value = listOf(bookmark1, bookmark2)
+
+        viewModel.onToggleTagFilter("ai")
+        viewModel.onToggleTagFilter("kotlin")
+        assertEquals(2, viewModel.uiState.value.selectedTags.size)
+
+        viewModel.onClearTagFilters()
+        assertTrue(viewModel.uiState.value.selectedTags.isEmpty())
+        assertFalse(viewModel.uiState.value.isSearching)
+    }
+
+    @Test
+    fun `tag filter with blank or hash-prefixed tag is normalized`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        collectionsFlow.value = listOf(collection1)
+        bookmarksFlow.value = listOf(bookmark1)
+
+        // blank tag should be ignored
+        viewModel.onToggleTagFilter("   ")
+        assertTrue(viewModel.uiState.value.selectedTags.isEmpty())
+
+        // hash-prefixed tag should be normalized
+        viewModel.onToggleTagFilter("#AI")
+        assertTrue(viewModel.uiState.value.selectedTags.contains("ai"))
+    }
 }

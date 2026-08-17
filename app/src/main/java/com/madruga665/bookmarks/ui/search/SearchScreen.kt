@@ -37,9 +37,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.unit.sp
 import com.madruga665.bookmarks.R
 import com.madruga665.bookmarks.ui.components.NeobrutalistButton
+import com.madruga665.bookmarks.ui.components.NeobrutalistTagChip
 import com.madruga665.bookmarks.ui.search.components.RecentlySavedSection
 import com.madruga665.bookmarks.ui.search.components.SearchEmptyState
 import com.madruga665.bookmarks.ui.search.components.SearchIdlePrompt
@@ -47,6 +51,7 @@ import com.madruga665.bookmarks.ui.search.components.SearchResultsList
 import com.madruga665.bookmarks.ui.search.components.YourLibraryCard
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 import com.madruga665.bookmarks.ui.theme.neobrutalistShadow
+import com.madruga665.bookmarks.ui.utils.TagItem
 
 /**
  * Top-level Search screen with search bar input, Cancel back button,
@@ -59,6 +64,8 @@ fun SearchScreen(
     onClearQuery: () -> Unit,
     onCancelClick: () -> Unit,
     onBookmarkClick: (String) -> Unit,
+    onToggleTagFilter: (String) -> Unit = {},
+    onClearTagFilters: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -189,6 +196,19 @@ fun SearchScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Tag Filter Chips Row
+            if (uiState.availableTags.isNotEmpty()) {
+                SearchTagFilterRow(
+                    availableTags = uiState.availableTags,
+                    selectedTags = uiState.selectedTags,
+                    onToggleTag = onToggleTagFilter,
+                    onClearTags = onClearTagFilters,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
             // Body: Discovery Mode vs Active Search Mode
             if (!uiState.isSearching) {
                 // Discovery Mode
@@ -232,8 +252,13 @@ fun SearchScreen(
                             .padding(top = 16.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
+                        val displayQuery = if (uiState.searchQuery.isNotBlank()) {
+                            uiState.searchQuery
+                        } else {
+                            uiState.selectedTags.joinToString(", ") { "#$it" }
+                        }
                         SearchEmptyState(
-                            searchQuery = uiState.searchQuery,
+                            searchQuery = displayQuery,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -246,6 +271,46 @@ fun SearchScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+/**
+ * Horizontal scrollable row of Neobrutalist tag chips for instant search filtering.
+ */
+@Composable
+fun SearchTagFilterRow(
+    availableTags: List<TagItem>,
+    selectedTags: Set<String>,
+    onToggleTag: (String) -> Unit,
+    onClearTags: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyRow(
+        modifier = modifier.testTag("tag_search_tag_filter_row"),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        item(key = "tag_all_filter") {
+            NeobrutalistTagChip(
+                tag = stringResource(R.string.tag_all_filter),
+                isSelected = selectedTags.isEmpty(),
+                showHash = false,
+                backgroundColor = if (selectedTags.isEmpty()) NeobrutalismTheme.colors.accentYellow else NeobrutalismTheme.colors.surface,
+                onTagClick = onClearTags
+            )
+        }
+        items(
+            items = availableTags,
+            key = { it.name }
+        ) { tagItem ->
+            NeobrutalistTagChip(
+                tag = tagItem.name,
+                isSelected = selectedTags.contains(tagItem.name),
+                showHash = true,
+                backgroundColor = tagItem.color,
+                onTagClick = { onToggleTag(tagItem.name) }
+            )
         }
     }
 }

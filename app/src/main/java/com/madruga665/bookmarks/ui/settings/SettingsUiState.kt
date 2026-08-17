@@ -7,6 +7,7 @@ data class UsageStatistics(
     val totalBookmarks: Int = 0,
     val bookmarksToday: Int = 0,
     val totalCollections: Int = 0,
+    val totalTags: Int = 0,
     val dailyLimit: Int = 4,
     val collectionLimit: Int = 3
 )

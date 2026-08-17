@@ -110,7 +110,8 @@ class BookmarkRepository(
     suspend fun quickSaveBookmark(
         url: String,
         collectionId: String = "col_unsorted",
-        isPinned: Boolean = false
+        isPinned: Boolean = false,
+        tags: String = ""
     ): Boolean = withContext(Dispatchers.IO) {
         val trimmedUrl = url.trim()
         if (trimmedUrl.isBlank() || (!trimmedUrl.startsWith("http://") && !trimmedUrl.startsWith("https://"))) {
@@ -129,7 +130,7 @@ class BookmarkRepository(
             sourcePlatform = metadata.sourcePlatform ?: "Web",
             collectionId = if (collectionId.isBlank()) "col_unsorted" else collectionId,
             notes = null,
-            tags = "",
+            tags = tags,
             isPinned = isPinned,
             createdAt = System.currentTimeMillis(),
             updatedAt = System.currentTimeMillis(),

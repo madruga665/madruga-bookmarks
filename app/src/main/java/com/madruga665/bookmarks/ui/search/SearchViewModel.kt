@@ -5,12 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.madruga665.bookmarks.data.local.BookmarkEntity
 import com.madruga665.bookmarks.data.repository.BookmarkRepository
 import com.madruga665.bookmarks.data.repository.CollectionRepository
+import com.madruga665.bookmarks.ui.utils.TagItem
+import com.madruga665.bookmarks.ui.utils.TagPalette
+import com.madruga665.bookmarks.ui.utils.tagList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,20 +24,33 @@ class SearchViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
+    private val _selectedTags = MutableStateFlow<Set<String>>(emptySet())
 
     val uiState: StateFlow<SearchUiState> = combine(
         bookmarkRepository.allBookmarks,
         collectionRepository.collections,
-        _searchQuery
-    ) { bookmarks, collections, query ->
+        _searchQuery,
+        _selectedTags
+    ) { bookmarks, collections, query, selectedTags ->
         val collectionsMap = collections.associateBy { it.id }
 
-        val uniqueTagsCount = bookmarks
-            .flatMap { it.tags.split(",") }
-            .map { it.trim() }
-            .filter { it.isNotBlank() }
-            .distinctBy { it.lowercase() }
-            .size
+        val tagCounts = bookmarks
+            .flatMap { it.tagList }
+            .groupingBy { it }
+            .eachCount()
+
+        val availableTags = tagCounts.map { (tagName, count) ->
+            TagItem(
+                name = tagName,
+                color = TagPalette.getTagColor(tagName),
+                count = count
+            )
+        }.sortedWith(
+            compareByDescending<TagItem> { it.count }
+                .thenBy { it.name }
+        )
+
+        val uniqueTagsCount = availableTags.size
 
         val stats = LibraryStats(
             collectionsCount = collections.size,
@@ -48,20 +65,31 @@ class SearchViewModel @Inject constructor(
 
         val cleanQuery = query.trim().lowercase()
 
-        val searchResults = if (cleanQuery.isBlank()) {
+        val searchResults = if (cleanQuery.isBlank() && selectedTags.isEmpty()) {
             emptyList()
         } else {
             bookmarks.filter { bookmark ->
-                val titleMatches = bookmark.title?.lowercase()?.contains(cleanQuery) == true
-                val urlMatches = bookmark.url.lowercase().contains(cleanQuery)
-                val descriptionMatches = bookmark.description?.lowercase()?.contains(cleanQuery) == true
-                val collectionMatches = collectionsMap[bookmark.collectionId]?.name?.lowercase()?.contains(cleanQuery) == true
-                val tagsMatch = bookmark.tags.split(",")
-                    .map { it.trim().lowercase() }
-                    .any { it.contains(cleanQuery) }
-                val notesMatches = bookmark.notes?.lowercase()?.contains(cleanQuery) == true
+                val tagsMatchFilter = if (selectedTags.isNotEmpty()) {
+                    val bTags = bookmark.tagList.toSet()
+                    bTags.containsAll(selectedTags)
+                } else {
+                    true
+                }
 
-                titleMatches || urlMatches || descriptionMatches || collectionMatches || tagsMatch || notesMatches
+                val queryMatchFilter = if (cleanQuery.isNotBlank()) {
+                    val titleMatches = bookmark.title?.lowercase()?.contains(cleanQuery) == true
+                    val urlMatches = bookmark.url.lowercase().contains(cleanQuery)
+                    val descriptionMatches = bookmark.description?.lowercase()?.contains(cleanQuery) == true
+                    val collectionMatches = collectionsMap[bookmark.collectionId]?.name?.lowercase()?.contains(cleanQuery) == true
+                    val tagsMatch = bookmark.tagList.any { it.contains(cleanQuery) }
+                    val notesMatches = bookmark.notes?.lowercase()?.contains(cleanQuery) == true
+
+                    titleMatches || urlMatches || descriptionMatches || collectionMatches || tagsMatch || notesMatches
+                } else {
+                    true
+                }
+
+                tagsMatchFilter && queryMatchFilter
             }.sortedWith(
                 compareByDescending<BookmarkEntity> { it.isPinned }
                     .thenByDescending { maxOf(it.updatedAt, it.createdAt) }
@@ -72,6 +100,8 @@ class SearchViewModel @Inject constructor(
             isLoading = false,
             searchQuery = query,
             libraryStats = stats,
+            availableTags = availableTags,
+            selectedTags = selectedTags,
             recentlySavedBookmarks = recentBookmarks,
             searchResults = searchResults,
             collectionsMap = collectionsMap,
@@ -89,5 +119,17 @@ class SearchViewModel @Inject constructor(
 
     fun onClearQuery() {
         _searchQuery.value = ""
+    }
+
+    fun onToggleTagFilter(tag: String) {
+        val clean = tag.trim().removePrefix("#").lowercase()
+        if (clean.isBlank()) return
+        _selectedTags.update { current ->
+            if (current.contains(clean)) current - clean else current + clean
+        }
+    }
+
+    fun onClearTagFilters() {
+        _selectedTags.value = emptySet()
     }
 }

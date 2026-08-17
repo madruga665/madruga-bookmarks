@@ -124,7 +124,9 @@ fun BookmarksNavGraph(
                 onCancelClick = { navController.popBackStack() },
                 onBookmarkClick = { bookmarkId ->
                     navController.navigate(NavRoutes.bookmarkDetail(bookmarkId))
-                }
+                },
+                onToggleTagFilter = searchViewModel::onToggleTagFilter,
+                onClearTagFilters = searchViewModel::onClearTagFilters
             )
         }
 
