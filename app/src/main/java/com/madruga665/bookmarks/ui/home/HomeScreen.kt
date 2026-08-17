@@ -100,14 +100,14 @@ fun HomeScreen(
                             if (text.isNotBlank()) {
                                 onPasteFromClipboard(text)
                             } else {
-                                Toast.makeText(context, context.getString(R.string.home_toast_clipboard_empty), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, R.string.home_toast_clipboard_empty, Toast.LENGTH_SHORT).show()
                             }
                         },
                         onAddClick = {
                             if (uiState.quickSaveUrlInput.isNotBlank()) {
                                 saveBookmarkViewModel.openSaveModal(uiState.quickSaveUrlInput)
                             } else {
-                                Toast.makeText(context, context.getString(R.string.home_toast_enter_valid_link), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, R.string.home_toast_enter_valid_link, Toast.LENGTH_SHORT).show()
                             }
                         }
                     )
@@ -191,7 +191,7 @@ fun HomeScreen(
         onConfirmSave = {
             saveBookmarkViewModel.onConfirmSave {
                 onUrlInputChange("")
-                Toast.makeText(context, context.getString(R.string.save_bookmark_success), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.save_bookmark_success, Toast.LENGTH_SHORT).show()
             }
         },
         onDismiss = saveBookmarkViewModel::dismissModal

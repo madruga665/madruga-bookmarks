@@ -32,6 +32,8 @@ import com.madruga665.bookmarks.ui.home.HomeScreen
 import com.madruga665.bookmarks.ui.home.HomeViewModel
 import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkBottomSheet
 import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkViewModel
+import com.madruga665.bookmarks.ui.search.SearchScreen
+import com.madruga665.bookmarks.ui.search.SearchViewModel
 import com.madruga665.bookmarks.ui.settings.SettingsScreen
 import com.madruga665.bookmarks.ui.settings.SettingsViewModel
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
@@ -106,7 +108,23 @@ fun BookmarksNavGraph(
         }
 
         composable(NavRoutes.SEARCH) {
-            PlaceholderDestination(title = "Search Screen")
+            val searchViewModel = remember {
+                SearchViewModel(
+                    bookmarkRepository = bookmarkRepository,
+                    collectionRepository = collectionRepository
+                )
+            }
+            val searchUiState by searchViewModel.uiState.collectAsState()
+
+            SearchScreen(
+                uiState = searchUiState,
+                onQueryChange = searchViewModel::onQueryChange,
+                onClearQuery = searchViewModel::onClearQuery,
+                onCancelClick = { navController.popBackStack() },
+                onBookmarkClick = { bookmarkId ->
+                    navController.navigate(NavRoutes.bookmarkDetail(bookmarkId))
+                }
+            )
         }
 
         composable(NavRoutes.SETTINGS) {
@@ -127,13 +145,13 @@ fun BookmarksNavGraph(
                 onLanguageSelect = settingsViewModel::setLanguage,
                 onToggleHapticFeedback = settingsViewModel::toggleHapticFeedback,
                 onExportBackupClick = {
-                    Toast.makeText(context, context.getString(R.string.toast_exporting_backup), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.toast_exporting_backup, Toast.LENGTH_SHORT).show()
                 },
                 onRestoreBackupClick = {
-                    Toast.makeText(context, context.getString(R.string.toast_restore_backup_soon), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.toast_restore_backup_soon, Toast.LENGTH_SHORT).show()
                 },
                 onImportBookmarksClick = {
-                    Toast.makeText(context, context.getString(R.string.toast_import_bookmarks_soon), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.toast_import_bookmarks_soon, Toast.LENGTH_SHORT).show()
                 }
             )
         }
@@ -185,7 +203,7 @@ fun BookmarksNavGraph(
                 onCreateFolderSubmit = saveBookmarkViewModel::onCreateFolderSubmit,
                 onConfirmSave = {
                     saveBookmarkViewModel.onConfirmSave {
-                        Toast.makeText(context, context.getString(R.string.save_bookmark_success), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, R.string.save_bookmark_success, Toast.LENGTH_SHORT).show()
                     }
                 },
                 onDismiss = saveBookmarkViewModel::dismissModal
