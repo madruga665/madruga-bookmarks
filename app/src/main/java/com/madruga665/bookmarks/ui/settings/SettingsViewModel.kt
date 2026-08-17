@@ -9,6 +9,7 @@ import com.madruga665.bookmarks.data.repository.AppThemeMode
 import com.madruga665.bookmarks.data.repository.BookmarkRepository
 import com.madruga665.bookmarks.data.repository.CollectionRepository
 import com.madruga665.bookmarks.data.repository.SettingsRepository
+import com.madruga665.bookmarks.ui.utils.tagList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -41,12 +42,18 @@ class SettingsViewModel @Inject constructor(
         val startOfDayMillis = calendar.timeInMillis
         val bookmarksTodayCount = bookmarks.count { it.createdAt >= startOfDayMillis }
 
+        val uniqueTagsCount = bookmarks
+            .flatMap { it.tagList }
+            .distinct()
+            .size
+
         SettingsUiState(
             isLoading = false,
             usageStatistics = UsageStatistics(
                 totalBookmarks = bookmarks.size,
                 bookmarksToday = bookmarksTodayCount,
                 totalCollections = collections.size,
+                totalTags = uniqueTagsCount,
                 dailyLimit = 4,
                 collectionLimit = 3
             ),

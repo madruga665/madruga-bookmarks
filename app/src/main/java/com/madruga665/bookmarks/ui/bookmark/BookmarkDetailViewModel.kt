@@ -138,17 +138,31 @@ class BookmarkDetailViewModel @Inject constructor(
     }
 
     fun onNewTagInputChange(text: String) {
-        _uiState.update { it.copy(newTagInput = text) }
+        _uiState.update { it.copy(newTagInput = text.take(25)) }
     }
 
     fun onSaveNewTag() {
-        val tag = _uiState.value.newTagInput.trim()
-        if (tag.isNotBlank()) {
-            viewModelScope.launch {
-                bookmarkRepository.addTag(bookmarkId, tag)
-                _uiState.update { it.copy(isAddingTag = false, newTagInput = "") }
-            }
-        } else {
+        val tag = _uiState.value.newTagInput.trim().removePrefix("#").lowercase()
+        if (tag.isBlank()) {
+            _uiState.update { it.copy(isAddingTag = false, newTagInput = "") }
+            return
+        }
+
+        val currentBookmark = _uiState.value.bookmark
+        val currentTags = currentBookmark?.tags?.split(",")?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList()
+
+        if (currentTags.size >= 10) {
+            _uiState.update { it.copy(userMessage = "Maximum of 10 tags reached") }
+            return
+        }
+
+        if (currentTags.any { it.equals(tag, ignoreCase = true) }) {
+            _uiState.update { it.copy(isAddingTag = false, newTagInput = "") }
+            return
+        }
+
+        viewModelScope.launch {
+            bookmarkRepository.addTag(bookmarkId, tag)
             _uiState.update { it.copy(isAddingTag = false, newTagInput = "") }
         }
     }

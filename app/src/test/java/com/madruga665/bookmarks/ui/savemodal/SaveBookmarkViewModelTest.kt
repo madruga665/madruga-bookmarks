@@ -198,7 +198,8 @@ class SaveBookmarkViewModelTest {
             bookmarkRepository.quickSaveBookmark(
                 url = "https://kotlinlang.org",
                 collectionId = "col_ia",
-                isPinned = true
+                isPinned = true,
+                tags = any()
             )
         } returns true
 
@@ -221,7 +222,8 @@ class SaveBookmarkViewModelTest {
             bookmarkRepository.quickSaveBookmark(
                 url = "https://kotlinlang.org",
                 collectionId = "col_ia",
-                isPinned = true
+                isPinned = true,
+                tags = any()
             )
         }
     }
@@ -232,7 +234,8 @@ class SaveBookmarkViewModelTest {
             bookmarkRepository.quickSaveBookmark(
                 url = "https://kotlinlang.org",
                 collectionId = "col_unsorted",
-                isPinned = false
+                isPinned = false,
+                tags = any()
             )
         } returns false
 
@@ -253,6 +256,120 @@ class SaveBookmarkViewModelTest {
     @Test
     fun onConfirmSave_blankUrl_doesNotTriggerSave() {
         viewModel.onConfirmSave {}
-        coVerify(exactly = 0) { bookmarkRepository.quickSaveBookmark(any(), any(), any()) }
+        coVerify(exactly = 0) { bookmarkRepository.quickSaveBookmark(any(), any(), any(), any()) }
+    }
+
+    // ---- Tag-related tests (T008) ----
+
+    @Test
+    fun onAddTag_validTag_addsToTagsAndClearsInput() {
+        viewModel.openSaveModal("https://example.com")
+        viewModel.onTagInputChange("android")
+        viewModel.onAddTag("android")
+
+        val state = viewModel.uiState.value
+        assertEquals(listOf("android"), state.tags)
+        assertEquals("", state.tagInput)
+    }
+
+    @Test
+    fun onAddTag_duplicateTag_isIgnored() {
+        viewModel.openSaveModal("https://example.com")
+        viewModel.onAddTag("kotlin")
+        viewModel.onAddTag("Kotlin")
+
+        assertEquals(listOf("kotlin"), viewModel.uiState.value.tags)
+    }
+
+    @Test
+    fun onAddTag_withHashPrefix_normalizesTag() {
+        viewModel.openSaveModal("https://example.com")
+        viewModel.onAddTag("#Android")
+
+        assertEquals(listOf("android"), viewModel.uiState.value.tags)
+    }
+
+    @Test
+    fun onAddTag_blankTag_isIgnored() {
+        viewModel.openSaveModal("https://example.com")
+        viewModel.onAddTag("   ")
+
+        assertTrue(viewModel.uiState.value.tags.isEmpty())
+    }
+
+    @Test
+    fun onAddTag_atMaxLimit_isRejected() {
+        viewModel.openSaveModal("https://example.com")
+        repeat(10) { i -> viewModel.onAddTag("tag$i") }
+        assertEquals(10, viewModel.uiState.value.tags.size)
+
+        viewModel.onAddTag("tag10")
+        assertEquals(10, viewModel.uiState.value.tags.size)
+    }
+
+    @Test
+    fun onRemoveTag_removesMatchingTag() {
+        viewModel.openSaveModal("https://example.com")
+        viewModel.onAddTag("kotlin")
+        viewModel.onAddTag("compose")
+        viewModel.onRemoveTag("kotlin")
+
+        assertEquals(listOf("compose"), viewModel.uiState.value.tags)
+    }
+
+    @Test
+    fun onRemoveTag_caseInsensitive() {
+        viewModel.openSaveModal("https://example.com")
+        viewModel.onAddTag("kotlin")
+        viewModel.onRemoveTag("Kotlin")
+
+        assertTrue(viewModel.uiState.value.tags.isEmpty())
+    }
+
+    @Test
+    fun onTagInputChange_truncatesAt25Characters() {
+        viewModel.openSaveModal("https://example.com")
+        val longInput = "a".repeat(30)
+        viewModel.onTagInputChange(longInput)
+
+        assertEquals(25, viewModel.uiState.value.tagInput.length)
+    }
+
+    @Test
+    fun onConfirmSave_withTags_passesTagsToRepository() {
+        coEvery {
+            bookmarkRepository.quickSaveBookmark(
+                url = any(),
+                collectionId = any(),
+                isPinned = any(),
+                tags = any()
+            )
+        } returns true
+
+        viewModel.openSaveModal("https://example.com")
+        viewModel.onAddTag("kotlin")
+        viewModel.onAddTag("compose")
+
+        viewModel.onConfirmSave {}
+
+        coVerify {
+            bookmarkRepository.quickSaveBookmark(
+                url = "https://example.com",
+                collectionId = any(),
+                isPinned = false,
+                tags = "kotlin,compose"
+            )
+        }
+    }
+
+    @Test
+    fun openSaveModal_resetsTags() {
+        viewModel.openSaveModal("https://example.com")
+        viewModel.onAddTag("kotlin")
+        assertEquals(1, viewModel.uiState.value.tags.size)
+
+        viewModel.openSaveModal("https://example2.com")
+        assertTrue(viewModel.uiState.value.tags.isEmpty())
+        assertEquals("", viewModel.uiState.value.tagInput)
     }
 }

@@ -198,6 +198,9 @@ fun HomeScreen(
         onNewFolderNameChange = saveBookmarkViewModel::onNewFolderNameChange,
         onNewFolderColorSelect = saveBookmarkViewModel::onNewFolderColorSelect,
         onCreateFolderSubmit = saveBookmarkViewModel::onCreateFolderSubmit,
+        onTagInputChange = saveBookmarkViewModel::onTagInputChange,
+        onAddTag = saveBookmarkViewModel::onAddTag,
+        onRemoveTag = saveBookmarkViewModel::onRemoveTag,
         onConfirmSave = {
             saveBookmarkViewModel.onConfirmSave {
                 onUrlInputChange("")

@@ -187,10 +187,35 @@ class BookmarkDetailViewModelTest {
 
         viewModel.onSaveNewTag()
         assertFalse(viewModel.uiState.value.isAddingTag)
-        coVerify { bookmarkRepository.addTag(targetBookmarkId, "Kotlin") }
+        coVerify { bookmarkRepository.addTag(targetBookmarkId, "kotlin") }
 
         viewModel.onRemoveTag("AI")
         coVerify { bookmarkRepository.removeTag(targetBookmarkId, "AI") }
+    }
+
+    @Test
+    fun onSaveNewTag_atMaxTags_rejectsNewTag() {
+        val bookmarkWithMaxTags = sampleBookmark.copy(tags = "t1,t2,t3,t4,t5,t6,t7,t8,t9,t10")
+        coEvery { bookmarkRepository.getBookmarkById(targetBookmarkId) } returns flowOf(bookmarkWithMaxTags)
+
+        val viewModel = createViewModel()
+        viewModel.onOpenAddTagDialog()
+        viewModel.onNewTagInputChange("newtag")
+        viewModel.onSaveNewTag()
+
+        assertEquals("Maximum of 10 tags reached", viewModel.uiState.value.userMessage)
+        coVerify(exactly = 0) { bookmarkRepository.addTag(any(), any()) }
+    }
+
+    @Test
+    fun onSaveNewTag_blankTag_doesNotCallRepository() {
+        val viewModel = createViewModel()
+        viewModel.onOpenAddTagDialog()
+        viewModel.onNewTagInputChange("   ")
+        viewModel.onSaveNewTag()
+
+        assertFalse(viewModel.uiState.value.isAddingTag)
+        coVerify(exactly = 0) { bookmarkRepository.addTag(any(), any()) }
     }
 
     @Test

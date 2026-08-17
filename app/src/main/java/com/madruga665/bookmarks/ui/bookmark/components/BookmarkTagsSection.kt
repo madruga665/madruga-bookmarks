@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.madruga665.bookmarks.R
 import com.madruga665.bookmarks.ui.components.NeobrutalistButton
+import com.madruga665.bookmarks.ui.components.NeobrutalistTagChip
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 import com.madruga665.bookmarks.ui.theme.neobrutalistShadow
 
@@ -73,9 +74,10 @@ fun BookmarkTagsSection(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             tagList.forEach { tag ->
-                TagChip(
+                NeobrutalistTagChip(
                     tag = tag,
-                    onRemove = { onRemoveTag(tag) }
+                    showHash = true,
+                    onRemoveClick = { onRemoveTag(tag) }
                 )
             }
 
@@ -117,54 +119,8 @@ fun BookmarkTagsSection(
     }
 }
 
-@Composable
-fun TagChip(
-    tag: String,
-    onRemove: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .neobrutalistShadow(
-                shadowColor = NeobrutalismTheme.colors.shadow,
-                borderColor = NeobrutalismTheme.colors.border,
-                borderWidth = 2.dp,
-                shadowOffset = 2.dp,
-                shape = RoundedCornerShape(8.dp)
-            )
-            .background(NeobrutalismTheme.colors.surface, RoundedCornerShape(8.dp))
-            .padding(start = 10.dp, end = 6.dp, top = 4.dp, bottom = 4.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = tag,
-                style = NeobrutalismTheme.typography.bodySmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp
-                ),
-                color = NeobrutalismTheme.colors.onSurface
-            )
 
-            Spacer(modifier = Modifier.width(6.dp))
 
-            Box(
-                modifier = Modifier
-                    .size(18.dp)
-                    .clickable(onClick = onRemove),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.bookmark_remove_tag_desc_fmt, tag),
-                    tint = NeobrutalismTheme.colors.subtext,
-                    modifier = Modifier.size(14.dp)
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun AddTagDialog(

@@ -99,31 +99,41 @@ fun UsageHeroCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // 3 Metric Boxes: Total Links, Links Today, Collections
-            Row(
+            // 2x2 Grid: Total Links, Links Today, Collections, Tags
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Metric 1: Total Links
-                MetricBox(
-                    title = stringResource(R.string.usage_total_links),
-                    value = usageStatistics.totalBookmarks,
-                    modifier = Modifier.weight(1f)
-                )
-
-                // Metric 2: Links Today
-                MetricBox(
-                    title = stringResource(R.string.usage_links_today),
-                    value = usageStatistics.bookmarksToday,
-                    modifier = Modifier.weight(1f)
-                )
-
-                // Metric 3: Collections
-                MetricBox(
-                    title = stringResource(R.string.usage_collections),
-                    value = usageStatistics.totalCollections,
-                    modifier = Modifier.weight(1f)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    MetricBox(
+                        title = stringResource(R.string.usage_total_links),
+                        value = usageStatistics.totalBookmarks,
+                        modifier = Modifier.weight(1f)
+                    )
+                    MetricBox(
+                        title = stringResource(R.string.usage_links_today),
+                        value = usageStatistics.bookmarksToday,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    MetricBox(
+                        title = stringResource(R.string.usage_collections),
+                        value = usageStatistics.totalCollections,
+                        modifier = Modifier.weight(1f)
+                    )
+                    MetricBox(
+                        title = stringResource(R.string.usage_total_tags),
+                        value = usageStatistics.totalTags,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
     }

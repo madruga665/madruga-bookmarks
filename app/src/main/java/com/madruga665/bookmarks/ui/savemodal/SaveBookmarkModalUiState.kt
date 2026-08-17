@@ -13,7 +13,10 @@ data class SaveBookmarkModalUiState(
     val newFolderColorAccent: String = "YELLOW",
     val folderInputError: String? = null,
     val isSaving: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val tags: List<String> = emptyList(),
+    val tagInput: String = "",
+    val existingTags: List<String> = emptyList()
 ) {
     val selectedCollection: CollectionEntity?
         get() = availableCollections.find { it.id == selectedCollectionId }

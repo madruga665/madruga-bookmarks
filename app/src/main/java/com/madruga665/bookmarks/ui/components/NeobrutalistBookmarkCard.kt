@@ -36,6 +36,7 @@ import com.madruga665.bookmarks.data.local.BookmarkEntity
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 import com.madruga665.bookmarks.ui.theme.neobrutalistShadow
 import com.madruga665.bookmarks.ui.utils.BookmarkDisplayUtils
+import com.madruga665.bookmarks.ui.utils.tagList
 
 @Composable
 fun NeobrutalistBookmarkCard(
@@ -170,6 +171,35 @@ fun NeobrutalistBookmarkCard(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                }
+
+                // Tag Badges Row
+                val tags = bookmark.tagList
+                if (tags.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        val maxDisplay = 3
+                        tags.take(maxDisplay).forEach { tag ->
+                            NeobrutalistTagChip(
+                                tag = tag,
+                                showHash = true
+                            )
+                        }
+                        if (tags.size > maxDisplay) {
+                            Text(
+                                text = "+${tags.size - maxDisplay}",
+                                style = NeobrutalismTheme.typography.bodySmall.copy(
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = NeobrutalismTheme.colors.subtext
+                            )
+                        }
+                    }
                 }
             }
         }
