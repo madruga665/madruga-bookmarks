@@ -23,12 +23,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material.icons.outlined.WorkOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,6 +58,8 @@ import com.madruga665.bookmarks.R
 import com.madruga665.bookmarks.data.local.CollectionEntity
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 import com.madruga665.bookmarks.ui.theme.neobrutalistShadow
+import com.madruga665.bookmarks.ui.utils.CollectionIconRegistry
+import com.madruga665.bookmarks.ui.utils.CollectionPalette
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -134,19 +133,9 @@ fun NeobrutalistFolderCard(
         label = "cardScale"
     )
 
-    val tabColor = when (collection.colorAccent.uppercase()) {
-        "YELLOW" -> NeobrutalismTheme.colors.accentYellow
-        "PURPLE" -> NeobrutalismTheme.colors.accentPurple
-        "ORANGE" -> NeobrutalismTheme.colors.accentOrange
-        "BLUE" -> NeobrutalismTheme.colors.accentBlue
-        else -> NeobrutalismTheme.colors.accentYellow
-    }
+    val tabColor = CollectionPalette.getColor(collection.colorAccent)
 
-    val iconVector: ImageVector = when (collection.iconKey.lowercase()) {
-        "code", "programacao" -> Icons.Outlined.Code
-        "work", "vagas" -> Icons.Outlined.WorkOutline
-        else -> Icons.Outlined.Code
-    }
+    val iconVector: ImageVector = CollectionIconRegistry.getIcon(collection.iconKey)
 
     val gestureModifier = if (onLongPressStart != null) {
         Modifier.pointerInput(collection.id) {

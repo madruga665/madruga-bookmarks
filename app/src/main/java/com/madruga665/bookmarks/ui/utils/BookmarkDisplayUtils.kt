@@ -1,8 +1,6 @@
 package com.madruga665.bookmarks.ui.utils
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 import java.net.URI
 
 object BookmarkDisplayUtils {
@@ -107,25 +105,7 @@ object BookmarkDisplayUtils {
         }
     }
 
-    @Composable
     fun getCollectionAccentColor(colorAccent: String?): Color {
-        return when (colorAccent?.uppercase()) {
-            "YELLOW" -> NeobrutalismTheme.colors.accentYellow
-            "PURPLE" -> NeobrutalismTheme.colors.accentPurple
-            "ORANGE" -> NeobrutalismTheme.colors.accentOrange
-            "BLUE" -> NeobrutalismTheme.colors.accentBlue
-            else -> {
-                if (!colorAccent.isNullOrBlank() && (colorAccent.startsWith("#") || colorAccent.length == 6 || colorAccent.length == 8)) {
-                    try {
-                        val hex = if (colorAccent.startsWith("#")) colorAccent else "#$colorAccent"
-                        Color(android.graphics.Color.parseColor(hex))
-                    } catch (e: Exception) {
-                        NeobrutalismTheme.colors.accentYellow
-                    }
-                } else {
-                    NeobrutalismTheme.colors.accentYellow
-                }
-            }
-        }
+        return CollectionPalette.getColor(colorAccent)
     }
 }

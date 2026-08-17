@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 fun NeobrutalistButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     containerColor: Color = NeobrutalismTheme.colors.surface,
     borderColor: Color = NeobrutalismTheme.colors.border,
     shadowColor: Color = NeobrutalismTheme.colors.shadow,
@@ -41,29 +42,32 @@ fun NeobrutalistButton(
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val currentShadowOffset by animateDpAsState(
-        targetValue = if (isPressed) 1.dp else shadowOffset,
+        targetValue = if (enabled && isPressed) 1.dp else if (!enabled) 0.dp else shadowOffset,
         label = "pressShadowOffset"
     )
 
     val currentContentOffset by animateDpAsState(
-        targetValue = if (isPressed) (shadowOffset - 1.dp) else 0.dp,
+        targetValue = if (enabled && isPressed) (shadowOffset - 1.dp) else 0.dp,
         label = "pressContentOffset"
     )
+
+    val activeContainerColor = if (enabled) containerColor else containerColor.copy(alpha = 0.5f)
 
     Box(
         modifier = modifier
             .offset(x = currentContentOffset, y = currentContentOffset)
             .neobrutalistShadow(
-                shadowColor = shadowColor,
+                shadowColor = if (enabled) shadowColor else Color.Transparent,
                 borderColor = borderColor,
                 borderWidth = borderWidth,
                 shadowOffset = currentShadowOffset,
                 shape = shape
             )
-            .background(containerColor, shape)
+            .background(activeContainerColor, shape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
+                enabled = enabled,
                 onClick = onClick
             )
             .padding(10.dp),
@@ -77,6 +81,7 @@ fun NeobrutalistButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     containerColor: Color = NeobrutalismTheme.colors.surface,
     contentColor: Color = if (containerColor == NeobrutalismTheme.colors.accentYellow) NeobrutalismTheme.colors.border else NeobrutalismTheme.colors.onSurface,
     borderColor: Color = NeobrutalismTheme.colors.border,
@@ -88,6 +93,7 @@ fun NeobrutalistButton(
     NeobrutalistButton(
         onClick = onClick,
         modifier = modifier,
+        enabled = enabled,
         containerColor = containerColor,
         borderColor = borderColor,
         shadowColor = shadowColor,
@@ -100,7 +106,7 @@ fun NeobrutalistButton(
             style = NeobrutalismTheme.typography.labelLarge.copy(
                 fontWeight = FontWeight.Bold
             ),
-            color = contentColor
+            color = if (enabled) contentColor else contentColor.copy(alpha = 0.5f)
         )
     }
 }

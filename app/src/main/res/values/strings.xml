@@ -88,6 +88,17 @@
     <string name="collection_edit_icon_label">Icon</string>
     <string name="collection_edit_error_empty">Collection title cannot be empty</string>
 
+    <!-- Collection Create -->
+    <string name="collection_create_title">Add new collection</string>
+    <string name="collection_create_name_label">NAME</string>
+    <string name="collection_create_name_hint">e.g. Travel, Design Inspiration...</string>
+    <string name="collection_create_color_label">COLOR</string>
+    <string name="collection_create_icon_label">ICON</string>
+    <string name="collection_create_button">Create collection</string>
+    <string name="collection_create_success">Collection created successfully!</string>
+    <string name="collection_create_error_empty">Collection name cannot be empty</string>
+    <string name="collection_create_close">Close</string>
+
     <!-- Bookmark Details -->
     <string name="bookmark_detail_title">Bookmark Details</string>
     <string name="bookmark_untitled">Untitled</string>

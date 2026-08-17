@@ -15,6 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -24,10 +27,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.madruga665.bookmarks.R
 import com.madruga665.bookmarks.data.local.CollectionEntity
+import com.madruga665.bookmarks.ui.collection.create.CreateCollectionBottomSheet
 import com.madruga665.bookmarks.ui.components.CollectionActionsOverlay
 import com.madruga665.bookmarks.ui.components.CollectionOption
 import com.madruga665.bookmarks.ui.components.DeleteCollectionDialog
 import com.madruga665.bookmarks.ui.components.EditCollectionDialog
+import com.madruga665.bookmarks.data.repository.CollectionRepository
 import com.madruga665.bookmarks.ui.home.components.HomeHeroHeadline
 import com.madruga665.bookmarks.ui.home.components.HomeScreenTopBar
 import com.madruga665.bookmarks.ui.home.components.MyCollectionsGrid
@@ -40,6 +45,7 @@ import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 fun HomeScreen(
     uiState: HomeScreenUiState,
     saveBookmarkViewModel: SaveBookmarkViewModel,
+    collectionRepository: CollectionRepository? = null,
     onUrlInputChange: (String) -> Unit,
     onPasteFromClipboard: (String) -> Unit,
     onCollectionClick: (String) -> Unit,
@@ -64,6 +70,7 @@ fun HomeScreen(
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
     val saveModalUiState by saveBookmarkViewModel.uiState.collectAsState()
+    var isCreateCollectionOpen by remember { mutableStateOf(false) }
 
     val successState = uiState as? HomeScreenUiState.Success
 
@@ -78,7 +85,9 @@ fun HomeScreen(
             // Top Action Bar
             HomeScreenTopBar(
                 onNavigateToSettings = onNavigateToSettings,
-                onNavigateToManageCollections = onNavigateToManageCollections,
+                onNavigateToManageCollections = {
+                    isCreateCollectionOpen = true
+                },
                 onNavigateToSearch = onNavigateToSearch
             )
 
@@ -182,6 +191,7 @@ fun HomeScreen(
     // Save Bookmark Bottom Sheet Modal
     SaveBookmarkBottomSheet(
         uiState = saveModalUiState,
+        collectionRepository = collectionRepository,
         onCollectionSelect = saveBookmarkViewModel::onSelectCollection,
         onTogglePin = saveBookmarkViewModel::onTogglePin,
         onToggleCreateFolder = saveBookmarkViewModel::onToggleCreateFolder,
@@ -196,4 +206,15 @@ fun HomeScreen(
         },
         onDismiss = saveBookmarkViewModel::dismissModal
     )
+
+    // Create Collection Bottom Sheet Modal
+    if (isCreateCollectionOpen) {
+        CreateCollectionBottomSheet(
+            onDismiss = { isCreateCollectionOpen = false },
+            onCollectionCreated = { _ ->
+                isCreateCollectionOpen = false
+            },
+            collectionRepository = collectionRepository
+        )
+    }
 }

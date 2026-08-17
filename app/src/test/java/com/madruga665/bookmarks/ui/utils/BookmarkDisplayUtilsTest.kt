@@ -63,4 +63,15 @@ class BookmarkDisplayUtilsTest {
         assertNotNull(result)
         assertTrue(result!!.contains("google.com/s2/favicons?domain=github.com"))
     }
+
+    @Test
+    fun getCollectionAccentColor_delegatesToCollectionPalette() {
+        assertEquals(CollectionPalette.getColor("yellow"), BookmarkDisplayUtils.getCollectionAccentColor("yellow"))
+        assertEquals(CollectionPalette.getColor("PURPLE"), BookmarkDisplayUtils.getCollectionAccentColor("PURPLE"))
+        assertEquals(CollectionPalette.getColor("#FF4B8B"), BookmarkDisplayUtils.getCollectionAccentColor("#FF4B8B"))
+        assertEquals(CollectionPalette.getColor("dark_slate"), BookmarkDisplayUtils.getCollectionAccentColor("dark_slate"))
+        assertEquals(CollectionPalette.defaultColor.color, BookmarkDisplayUtils.getCollectionAccentColor(null))
+        assertEquals(CollectionPalette.defaultColor.color, BookmarkDisplayUtils.getCollectionAccentColor(""))
+        assertEquals(CollectionPalette.defaultColor.color, BookmarkDisplayUtils.getCollectionAccentColor("unknown_non_existent"))
+    }
 }

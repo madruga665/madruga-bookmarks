@@ -41,16 +41,20 @@ class CollectionRepository(
         collection?.copy(linkCount = bookmarks.size)
     }
 
-    suspend fun createCollection(name: String, colorAccent: String): CollectionEntity? {
-        if (name.isBlank()) return null
+    suspend fun createCollection(
+        name: String,
+        colorAccent: String,
+        iconKey: String = "folder"
+    ): CollectionEntity? {
+        if (name.isBlank() || name.length > 40) return null
         val entity = CollectionEntity(
             id = UUID.randomUUID().toString(),
             name = name.trim(),
             linkCount = 0,
             subcollectionCount = 0,
             parentId = null,
-            iconKey = "folder",
-            colorAccent = colorAccent.uppercase(),
+            iconKey = if (iconKey.isNotBlank()) iconKey.trim() else "folder",
+            colorAccent = colorAccent.trim(),
             createdAt = System.currentTimeMillis(),
             updatedAt = System.currentTimeMillis()
         )

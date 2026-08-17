@@ -71,6 +71,7 @@ fun BookmarksNavGraph(
             HomeScreen(
                 uiState = uiState,
                 saveBookmarkViewModel = saveBookmarkViewModel,
+                collectionRepository = collectionRepository,
                 onUrlInputChange = homeViewModel::onUrlInputChange,
                 onPasteFromClipboard = homeViewModel::onPasteFromClipboard,
                 onCollectionClick = { collectionId ->
@@ -195,6 +196,7 @@ fun BookmarksNavGraph(
 
             SaveBookmarkBottomSheet(
                 uiState = saveModalUiState,
+                collectionRepository = collectionRepository,
                 onCollectionSelect = saveBookmarkViewModel::onSelectCollection,
                 onTogglePin = saveBookmarkViewModel::onTogglePin,
                 onToggleCreateFolder = saveBookmarkViewModel::onToggleCreateFolder,
