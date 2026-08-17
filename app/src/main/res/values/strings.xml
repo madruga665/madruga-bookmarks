@@ -158,4 +158,19 @@
     <string name="toast_exporting_backup">Exporting backup...</string>
     <string name="toast_restore_backup_soon">Restore Backup feature coming soon</string>
     <string name="toast_import_bookmarks_soon">Import Bookmarks feature coming soon</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">Find collections or links...</string>
+    <string name="search_cancel">Cancel</string>
+    <string name="search_your_library">YOUR LIBRARY</string>
+    <string name="search_collections">Collections</string>
+    <string name="search_links">Links</string>
+    <string name="search_pinned">Pinned</string>
+    <string name="search_tags">Tags</string>
+    <string name="search_recently_saved">RECENTLY SAVED</string>
+    <string name="search_idle_prompt">Type something to search...</string>
+    <string name="search_no_results_fmt">No results found for \"%s\"</string>
+    <string name="search_no_results">No results found</string>
+    <string name="search_results_count_fmt">%d results found</string>
+    <string name="search_clear_query">Clear search</string>
 </resources>

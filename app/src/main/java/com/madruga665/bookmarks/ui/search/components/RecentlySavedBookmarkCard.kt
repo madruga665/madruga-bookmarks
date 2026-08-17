@@ -1,4 +1,4 @@
-package com.madruga665.bookmarks.ui.components
+package com.madruga665.bookmarks.ui.search.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,22 +24,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.madruga665.bookmarks.R
 import com.madruga665.bookmarks.data.local.BookmarkEntity
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 import com.madruga665.bookmarks.ui.theme.neobrutalistShadow
 import com.madruga665.bookmarks.ui.utils.BookmarkDisplayUtils
 
+/**
+ * Neobrutalist card representing a recently saved bookmark in the discovery carousel.
+ * Displays preview thumbnail, overlaid collection pill tag, title, and source platform indicator.
+ */
 @Composable
-fun NeobrutalistBookmarkCard(
+fun RecentlySavedBookmarkCard(
     bookmark: BookmarkEntity,
+    collectionName: String?,
+    collectionColor: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -47,37 +55,42 @@ fun NeobrutalistBookmarkCard(
     val displayThumbnail = BookmarkDisplayUtils.getThumbnailUrl(bookmark.thumbnailUrl, bookmark.url)
     val sourceLabel = BookmarkDisplayUtils.getSourceLabel(bookmark.sourcePlatform, bookmark.url)
     val faviconModel = BookmarkDisplayUtils.getFaviconUrl(bookmark.faviconUrl, bookmark.url)
+    val badgeColor = BookmarkDisplayUtils.getCollectionAccentColor(collectionColor)
+    val displayCollectionName = (collectionName?.takeIf { it.isNotBlank() }
+        ?: stringResource(R.string.save_unsorted)).uppercase()
+
+    val cardShape = RoundedCornerShape(12.dp)
 
     Box(
         modifier = modifier
-            .fillMaxWidth()
-            .testTag("tag_bookmark_card_${bookmark.id}")
+            .width(190.dp)
+            .testTag("tag_recently_saved_card_${bookmark.id}")
             .neobrutalistShadow(
                 shadowColor = NeobrutalismTheme.colors.shadow,
                 borderColor = NeobrutalismTheme.colors.border,
-                borderWidth = 2.5.dp,
-                shadowOffset = 4.dp,
-                shape = RoundedCornerShape(16.dp)
+                borderWidth = 2.dp,
+                shadowOffset = 3.dp,
+                shape = cardShape
             )
             .background(
                 color = NeobrutalismTheme.colors.surface,
-                shape = RoundedCornerShape(16.dp)
+                shape = cardShape
             )
-            .clip(RoundedCornerShape(16.dp))
+            .clip(cardShape)
             .clickable(onClick = onClick)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Top Preview Image Container (116.dp height)
+            // Top Preview Thumbnail Container
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(116.dp)
+                    .height(110.dp)
                     .background(NeobrutalismTheme.colors.accentYellow.copy(alpha = 0.25f)),
                 contentAlignment = Alignment.Center
             ) {
-                if (!displayThumbnail.isNullOrBlank()) {
+                if (displayThumbnail.isNotBlank()) {
                     AsyncImage(
                         model = displayThumbnail,
                         contentDescription = "Bookmark thumbnail preview",
@@ -87,71 +100,99 @@ fun NeobrutalistBookmarkCard(
                 } else {
                     Box(
                         modifier = Modifier
-                            .size(42.dp)
+                            .size(38.dp)
                             .neobrutalistShadow(
                                 shadowColor = NeobrutalismTheme.colors.shadow,
                                 borderColor = NeobrutalismTheme.colors.border,
                                 borderWidth = 2.dp,
                                 shadowOffset = 2.dp,
-                                shape = RoundedCornerShape(10.dp)
+                                shape = RoundedCornerShape(8.dp)
                             )
-                            .background(NeobrutalismTheme.colors.surface, RoundedCornerShape(10.dp)),
+                            .background(NeobrutalismTheme.colors.surface, RoundedCornerShape(8.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Link,
                             contentDescription = "Bookmark preview",
                             tint = NeobrutalismTheme.colors.onSurface,
-                            modifier = Modifier.size(22.dp)
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
+
+                // Overlaid Collection Pill Badge on bottom-left of thumbnail
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 8.dp, bottom = 8.dp)
+                        .neobrutalistShadow(
+                            shadowColor = NeobrutalismTheme.colors.shadow,
+                            borderColor = NeobrutalismTheme.colors.border,
+                            borderWidth = 1.5.dp,
+                            shadowOffset = 1.5.dp,
+                            shape = RoundedCornerShape(6.dp)
+                        )
+                        .background(badgeColor, RoundedCornerShape(6.dp))
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = displayCollectionName,
+                        style = TextStyle(
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 0.5.sp,
+                            color = NeobrutalismTheme.colors.border
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
-            // Card Body: Title + Origin Platform Metadata Row
+            // Card Body: Title + Platform Row
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp)
+                    .padding(10.dp)
             ) {
-                // Link Title (Bold, max 2 lines)
+                // Title (Bold, max 2 lines)
                 Text(
                     text = displayTitle,
-                    style = NeobrutalismTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
+                    style = TextStyle(
                         fontSize = 13.sp,
-                        lineHeight = 17.sp
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = 17.sp,
+                        color = NeobrutalismTheme.colors.onSurface
                     ),
-                    color = NeobrutalismTheme.colors.onSurface,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                // Bottom Metadata Row: Origin Icon + Platform Name
+                // Bottom Platform Row
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(18.dp)
+                            .size(16.dp)
                             .clip(CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         if (!faviconModel.isNullOrBlank()) {
                             AsyncImage(
                                 model = faviconModel,
-                                contentDescription = "Source Icon",
+                                contentDescription = "Platform Icon",
                                 modifier = Modifier
-                                    .size(18.dp)
+                                    .fillMaxSize()
                                     .clip(CircleShape)
                             )
                         } else {
                             Icon(
                                 imageVector = Icons.Outlined.Language,
-                                contentDescription = "Source",
+                                contentDescription = "Platform",
                                 tint = NeobrutalismTheme.colors.onSurface,
                                 modifier = Modifier.size(14.dp)
                             )
@@ -162,11 +203,11 @@ fun NeobrutalistBookmarkCard(
 
                     Text(
                         text = sourceLabel,
-                        style = NeobrutalismTheme.typography.bodySmall.copy(
+                        style = TextStyle(
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            color = NeobrutalismTheme.colors.subtext
                         ),
-                        color = NeobrutalismTheme.colors.subtext,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -175,4 +216,3 @@ fun NeobrutalistBookmarkCard(
         }
     }
 }
-
