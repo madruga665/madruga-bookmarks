@@ -21,6 +21,10 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,7 +33,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.madruga665.bookmarks.data.repository.CollectionRepository
 import com.madruga665.bookmarks.R
+import com.madruga665.bookmarks.ui.collection.create.CreateCollectionBottomSheet
 import com.madruga665.bookmarks.ui.components.NeobrutalistButton
 import com.madruga665.bookmarks.ui.components.NeobrutalistSelectableFolderCard
 import com.madruga665.bookmarks.ui.savemodal.components.InlineCreateFolderForm
@@ -49,10 +55,12 @@ fun SaveBookmarkBottomSheet(
     onCreateFolderSubmit: () -> Unit,
     onConfirmSave: () -> Unit,
     onDismiss: () -> Unit,
+    collectionRepository: CollectionRepository? = null,
     modifier: Modifier = Modifier
 ) {
     if (!uiState.isVisible) return
 
+    var isCreateCollectionOpen by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
@@ -95,7 +103,9 @@ fun SaveBookmarkBottomSheet(
 
                 // Top-Right New Folder Action Button
                 NeobrutalistButton(
-                    onClick = onToggleCreateFolder,
+                    onClick = {
+                        isCreateCollectionOpen = true
+                    },
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.testTag("tag_modal_new_folder_btn")
                 ) {
@@ -181,5 +191,16 @@ fun SaveBookmarkBottomSheet(
                 )
             }
         }
+    }
+
+    if (isCreateCollectionOpen) {
+        CreateCollectionBottomSheet(
+            onDismiss = { isCreateCollectionOpen = false },
+            onCollectionCreated = { created ->
+                onCollectionSelect(created.id)
+                isCreateCollectionOpen = false
+            },
+            collectionRepository = collectionRepository
+        )
     }
 }

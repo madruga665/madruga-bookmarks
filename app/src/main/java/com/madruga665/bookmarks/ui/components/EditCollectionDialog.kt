@@ -39,6 +39,7 @@ import com.madruga665.bookmarks.ui.components.NeobrutalistButton
 import com.madruga665.bookmarks.ui.components.NeobrutalistTextField
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 import com.madruga665.bookmarks.ui.theme.neobrutalistShadow
+import com.madruga665.bookmarks.ui.utils.CollectionPalette
 
 @Composable
 fun EditCollectionDialog(
@@ -127,13 +128,7 @@ fun EditCollectionDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     colors.forEach { colorToken ->
-                        val color = when (colorToken) {
-                            "YELLOW" -> NeobrutalismTheme.colors.accentYellow
-                            "PURPLE" -> NeobrutalismTheme.colors.accentPurple
-                            "ORANGE" -> NeobrutalismTheme.colors.accentOrange
-                            "BLUE" -> NeobrutalismTheme.colors.accentBlue
-                            else -> NeobrutalismTheme.colors.accentYellow
-                        }
+                        val color = CollectionPalette.getColor(colorToken)
                         val isSelected = selectedColor == colorToken
 
                         Box(

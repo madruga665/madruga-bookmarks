@@ -88,6 +88,17 @@
     <string name="collection_edit_icon_label">Ícone</string>
     <string name="collection_edit_error_empty">O título da coleção não pode ser vazio</string>
 
+    <!-- Collection Create -->
+    <string name="collection_create_title">Nova coleção</string>
+    <string name="collection_create_name_label">NOME</string>
+    <string name="collection_create_name_hint">ex: Viagens, Inspiração de Design...</string>
+    <string name="collection_create_color_label">COR</string>
+    <string name="collection_create_icon_label">ÍCONE</string>
+    <string name="collection_create_button">Criar coleção</string>
+    <string name="collection_create_success">Coleção criada com sucesso!</string>
+    <string name="collection_create_error_empty">Nome da coleção não pode ser vazio</string>
+    <string name="collection_create_close">Fechar</string>
+
     <!-- Bookmark Details -->
     <string name="bookmark_detail_title">Detalhes do Bookmark</string>
     <string name="bookmark_untitled">Sem título</string>
