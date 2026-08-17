@@ -71,6 +71,13 @@ All Gradle commands are executed directly from the project root (`madruga665-boo
 ./gradlew check
 ```
 
+### Continuous Integration (CI)
+GitHub Actions workflow configured in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) executes on every `push` and `pull_request` to `main`:
+- **Lint & Static Checks**: Runs `./gradlew lintDebug` and uploads lint reports.
+- **Unit Tests**: Runs `./gradlew testDebugUnitTest` and uploads JUnit reports.
+- **Build**: Compiles `./gradlew assembleDebug` and archives the debug APK artifact.
+
+
 ---
 
 ## 5. SpecKit Feature Development Workflow
