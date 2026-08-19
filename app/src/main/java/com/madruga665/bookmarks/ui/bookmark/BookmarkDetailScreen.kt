@@ -31,7 +31,7 @@ import com.madruga665.bookmarks.ui.bookmark.components.BookmarkNotesSection
 import com.madruga665.bookmarks.ui.bookmark.components.BookmarkTagsSection
 import com.madruga665.bookmarks.ui.bookmark.components.BookmarkTitleSection
 import com.madruga665.bookmarks.ui.bookmark.components.BookmarkUrlCard
-import com.madruga665.bookmarks.ui.bookmark.components.DeleteConfirmationDialog
+import com.madruga665.bookmarks.ui.components.DeleteConfirmationDialog
 import com.madruga665.bookmarks.ui.bookmark.components.MoveCollectionBottomSheet
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
 

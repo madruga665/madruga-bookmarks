@@ -1,7 +1,5 @@
 package com.madruga665.bookmarks.ui.navigation
 
-import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,11 +17,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.madruga665.bookmarks.R
+import com.madruga665.bookmarks.data.local.BookmarkEntity
+import com.madruga665.bookmarks.data.local.CollectionEntity
 import com.madruga665.bookmarks.data.repository.BookmarkRepository
 import com.madruga665.bookmarks.data.repository.CollectionRepository
 import com.madruga665.bookmarks.data.repository.SettingsRepository
 import com.madruga665.bookmarks.ui.bookmark.BookmarkDetailScreen
 import com.madruga665.bookmarks.ui.bookmark.BookmarkDetailViewModel
+import com.madruga665.bookmarks.ui.components.BookmarkOption
+import com.madruga665.bookmarks.ui.utils.LinkOpener
 import com.madruga665.bookmarks.ui.utils.ShareUtils
 import com.madruga665.bookmarks.ui.utils.UrlUtils
 import com.madruga665.bookmarks.ui.collection.CollectionDetailScreen
@@ -74,7 +76,7 @@ fun BookmarksNavGraph(
                 collectionRepository = collectionRepository,
                 onUrlInputChange = homeViewModel::onUrlInputChange,
                 onPasteFromClipboard = homeViewModel::onPasteFromClipboard,
-                onCollectionClick = { collectionId ->
+                onCollectionClick = { collectionId: String ->
                     navController.navigate(NavRoutes.folderDetail(collectionId))
                 },
                 onCollectionLongClick = homeViewModel::openActionsMenu,
@@ -88,7 +90,7 @@ fun BookmarksNavGraph(
                 onHoveredOptionChange = homeViewModel::onHoveredOptionChange,
                 onDismissActionsMenu = homeViewModel::dismissActionsMenu,
                 onEditCollectionClick = homeViewModel::openEditDialog,
-                onShareCollectionClick = { collection ->
+                onShareCollectionClick = { collection: CollectionEntity ->
                     homeViewModel.shareCollection(context, collection)
                 },
                 onDeleteCollectionClick = homeViewModel::openDeleteDialog,
@@ -109,6 +111,7 @@ fun BookmarksNavGraph(
         }
 
         composable(NavRoutes.SEARCH) {
+            val context = LocalContext.current
             val searchViewModel = remember {
                 SearchViewModel(
                     bookmarkRepository = bookmarkRepository,
@@ -122,11 +125,27 @@ fun BookmarksNavGraph(
                 onQueryChange = searchViewModel::onQueryChange,
                 onClearQuery = searchViewModel::onClearQuery,
                 onCancelClick = { navController.popBackStack() },
-                onBookmarkClick = { bookmarkId ->
+                onBookmarkClick = { bookmarkId: String ->
                     navController.navigate(NavRoutes.bookmarkDetail(bookmarkId))
                 },
                 onToggleTagFilter = searchViewModel::onToggleTagFilter,
-                onClearTagFilters = searchViewModel::onClearTagFilters
+                onClearTagFilters = searchViewModel::onClearTagFilters,
+                onBookmarkLongPressStart = searchViewModel::onLongPressStart,
+                onBookmarkLongPressDrag = searchViewModel::onLongPressDrag,
+                onBookmarkLongPressRelease = {
+                    searchViewModel.onLongPressRelease { bookmark, option ->
+                        when (option) {
+                            BookmarkOption.OPEN -> LinkOpener.openUrl(context, bookmark.url)
+                            BookmarkOption.PIN -> searchViewModel.togglePin(bookmark.id)
+                            BookmarkOption.SHARE -> ShareUtils.shareBookmark(context, bookmark)
+                            BookmarkOption.DELETE -> searchViewModel.openDeleteDialog(bookmark)
+                        }
+                    }
+                },
+                onBookmarkHoveredOptionChange = searchViewModel::onHoveredOptionChange,
+                onDismissBookmarkActionsMenu = searchViewModel::dismissActionsMenu,
+                onDismissDeleteBookmarkDialog = searchViewModel::dismissDeleteDialog,
+                onConfirmDeleteBookmark = searchViewModel::deleteBookmark
             )
         }
 
@@ -188,12 +207,28 @@ fun BookmarksNavGraph(
                 onOptionsClick = {
                     // Options click handler
                 },
-                onBookmarkClick = { bookmark ->
+                onBookmarkClick = { bookmark: BookmarkEntity ->
                     navController.navigate(NavRoutes.bookmarkDetail(bookmark.id))
                 },
-                onSubcollectionClick = { subcollectionId ->
+                onSubcollectionClick = { subcollectionId: String ->
                     navController.navigate(NavRoutes.folderDetail(subcollectionId))
-                }
+                },
+                onBookmarkLongPressStart = viewModel::onLongPressStart,
+                onBookmarkLongPressDrag = viewModel::onLongPressDrag,
+                onBookmarkLongPressRelease = {
+                    viewModel.onLongPressRelease { bookmark, option ->
+                        when (option) {
+                            BookmarkOption.OPEN -> LinkOpener.openUrl(context, bookmark.url)
+                            BookmarkOption.PIN -> viewModel.togglePin(bookmark.id)
+                            BookmarkOption.SHARE -> ShareUtils.shareBookmark(context, bookmark)
+                            BookmarkOption.DELETE -> viewModel.openDeleteDialog(bookmark)
+                        }
+                    }
+                },
+                onBookmarkHoveredOptionChange = viewModel::onHoveredOptionChange,
+                onDismissBookmarkActionsMenu = viewModel::dismissActionsMenu,
+                onDismissDeleteBookmarkDialog = viewModel::dismissDeleteDialog,
+                onConfirmDeleteBookmark = viewModel::deleteBookmark
             )
 
             SaveBookmarkBottomSheet(
@@ -232,7 +267,7 @@ fun BookmarksNavGraph(
                 onRefreshClick = bookmarkDetailViewModel::onRefreshMetadata,
                 onShareClick = {
                     bookmarkUiState.bookmark?.let { bm ->
-                        ShareUtils.shareBookmark(context, bm.title, bm.url)
+                        ShareUtils.shareBookmark(context, bm)
                     }
                 },
                 onMoveClick = bookmarkDetailViewModel::onOpenMoveCollectionSheet,
@@ -242,7 +277,7 @@ fun BookmarksNavGraph(
                 onTitleChange = bookmarkDetailViewModel::onTitleChange,
                 onSaveTitle = bookmarkDetailViewModel::onSaveTitle,
                 onCancelEditingTitle = bookmarkDetailViewModel::onCancelEditingTitle,
-                onUrlClick = { url -> UrlUtils.openBrowserUrl(context, url) },
+                onUrlClick = { url: String -> UrlUtils.openBrowserUrl(context, url) },
                 onToggleDescriptionExpanded = bookmarkDetailViewModel::onToggleDescriptionExpanded,
                 onStartEditingNotes = bookmarkDetailViewModel::onStartEditingNotes,
                 onNotesChange = bookmarkDetailViewModel::onNotesChange,
@@ -284,4 +319,3 @@ private fun PlaceholderDestination(title: String) {
         )
     }
 }
-

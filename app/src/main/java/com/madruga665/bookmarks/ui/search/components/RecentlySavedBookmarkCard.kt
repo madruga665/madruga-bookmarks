@@ -2,6 +2,8 @@ package com.madruga665.bookmarks.ui.search.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,15 +23,26 @@ import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -49,8 +62,59 @@ fun RecentlySavedBookmarkCard(
     collectionName: String?,
     collectionColor: String?,
     onClick: () -> Unit,
+    onLongPressStart: ((BookmarkEntity, Offset, Offset, IntSize) -> Unit)? = null,
+    onLongPressDrag: ((Offset) -> Unit)? = null,
+    onLongPressRelease: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    val haptic = LocalHapticFeedback.current
+    var cardWindowOffset by remember { mutableStateOf(Offset.Zero) }
+    var cardSize by remember { mutableStateOf(IntSize.Zero) }
+
+    val gestureModifier = if (onLongPressStart != null) {
+        Modifier.pointerInput(bookmark.id) {
+            awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                val downTime = System.currentTimeMillis()
+                var isLongPressActive = false
+                val pointerId = down.id
+
+                while (true) {
+                    val event = awaitPointerEvent()
+                    val change = event.changes.firstOrNull { it.id == pointerId }
+
+                    if (change == null || !change.pressed) {
+                        if (isLongPressActive) {
+                            onLongPressRelease?.invoke()
+                        } else {
+                            val duration = System.currentTimeMillis() - downTime
+                            if (duration < 350) {
+                                onClick()
+                            }
+                        }
+                        break
+                    }
+
+                    val elapsed = System.currentTimeMillis() - downTime
+                    if (!isLongPressActive && elapsed >= 350) {
+                        isLongPressActive = true
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        val touchInWindow = cardWindowOffset + change.position
+                        onLongPressStart(bookmark, touchInWindow, cardWindowOffset, cardSize)
+                    }
+
+                    if (isLongPressActive) {
+                        change.consume()
+                        val touchInWindow = cardWindowOffset + change.position
+                        onLongPressDrag?.invoke(touchInWindow)
+                    }
+                }
+            }
+        }
+    } else {
+        Modifier.clickable(onClick = onClick)
+    }
+
     val displayTitle = BookmarkDisplayUtils.getDisplayTitle(bookmark.title, bookmark.url)
     val displayThumbnail = BookmarkDisplayUtils.getThumbnailUrl(bookmark.thumbnailUrl, bookmark.url)
     val sourceLabel = BookmarkDisplayUtils.getSourceLabel(bookmark.sourcePlatform, bookmark.url)
@@ -65,6 +129,10 @@ fun RecentlySavedBookmarkCard(
         modifier = modifier
             .width(190.dp)
             .testTag("tag_recently_saved_card_${bookmark.id}")
+            .onGloballyPositioned { coordinates ->
+                cardWindowOffset = coordinates.positionInWindow()
+                cardSize = coordinates.size
+            }
             .neobrutalistShadow(
                 shadowColor = NeobrutalismTheme.colors.shadow,
                 borderColor = NeobrutalismTheme.colors.border,
@@ -77,7 +145,7 @@ fun RecentlySavedBookmarkCard(
                 shape = cardShape
             )
             .clip(cardShape)
-            .clickable(onClick = onClick)
+            .then(gestureModifier)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()

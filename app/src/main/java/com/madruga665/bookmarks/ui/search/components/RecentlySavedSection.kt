@@ -17,10 +17,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.madruga665.bookmarks.R
@@ -37,6 +39,9 @@ fun RecentlySavedSection(
     bookmarks: List<BookmarkEntity>,
     collectionsMap: Map<String, CollectionEntity>,
     onBookmarkClick: (String) -> Unit,
+    onLongPressStart: ((BookmarkEntity, Offset, Offset, IntSize) -> Unit)? = null,
+    onLongPressDrag: ((Offset) -> Unit)? = null,
+    onLongPressRelease: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     if (bookmarks.isEmpty()) return
@@ -89,7 +94,10 @@ fun RecentlySavedSection(
                     bookmark = bookmark,
                     collectionName = collection?.name,
                     collectionColor = collection?.colorAccent,
-                    onClick = { onBookmarkClick(bookmark.id) }
+                    onClick = { onBookmarkClick(bookmark.id) },
+                    onLongPressStart = onLongPressStart,
+                    onLongPressDrag = onLongPressDrag,
+                    onLongPressRelease = onLongPressRelease
                 )
             }
         }
