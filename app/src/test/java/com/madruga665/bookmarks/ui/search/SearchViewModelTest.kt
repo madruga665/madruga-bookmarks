@@ -1,10 +1,14 @@
 package com.madruga665.bookmarks.ui.search
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.IntSize
 import com.madruga665.bookmarks.data.local.BookmarkEntity
 import com.madruga665.bookmarks.data.local.CollectionEntity
 import com.madruga665.bookmarks.data.repository.BookmarkRepository
 import com.madruga665.bookmarks.data.repository.CollectionRepository
+import com.madruga665.bookmarks.ui.components.BookmarkOption
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +22,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -561,5 +566,130 @@ class SearchViewModelTest {
         // hash-prefixed tag should be normalized
         viewModel.onToggleTagFilter("#AI")
         assertTrue(viewModel.uiState.value.selectedTags.contains("ai"))
+    }
+
+    // ---- Actions Menu & Overlay Tests (T005 / T018) ----
+
+    @Test
+    fun `onLongPressStart updates active overlay state correctly`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        val touchOffset = Offset(100f, 200f)
+        val cardOffset = Offset(50f, 150f)
+        val cardSize = IntSize(300, 100)
+
+        viewModel.onLongPressStart(bookmark1, touchOffset, cardOffset, cardSize)
+
+        val state = viewModel.uiState.value
+        assertEquals(bookmark1, state.activeMenuBookmark)
+        assertEquals(touchOffset, state.touchPositionInWindow)
+        assertEquals(cardOffset, state.activeCardOffset)
+        assertEquals(cardSize, state.activeCardSize)
+        assertNull(state.hoveredOption)
+        assertNull(state.bookmarkToDelete)
+        assertTrue(state.isMenuVisible)
+    }
+
+    @Test
+    fun `onLongPressDrag updates touch position when menu is active`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.onLongPressStart(bookmark1, Offset(100f, 200f), Offset(50f, 150f), IntSize(300, 100))
+
+        val newTouchOffset = Offset(120f, 250f)
+        viewModel.onLongPressDrag(newTouchOffset)
+
+        val state = viewModel.uiState.value
+        assertEquals(newTouchOffset, state.touchPositionInWindow)
+    }
+
+    @Test
+    fun `onHoveredOptionChange updates hovered option in state`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.onLongPressStart(bookmark1, Offset(100f, 200f), Offset(50f, 150f), IntSize(300, 100))
+
+        viewModel.onHoveredOptionChange(BookmarkOption.PIN)
+        assertEquals(BookmarkOption.PIN, viewModel.uiState.value.hoveredOption)
+
+        viewModel.onHoveredOptionChange(BookmarkOption.DELETE)
+        assertEquals(BookmarkOption.DELETE, viewModel.uiState.value.hoveredOption)
+
+        viewModel.onHoveredOptionChange(null)
+        assertNull(viewModel.uiState.value.hoveredOption)
+    }
+
+    @Test
+    fun `dismissActionsMenu and onLongPressRelease clear active overlay state`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.onLongPressStart(bookmark1, Offset(100f, 200f), Offset(50f, 150f), IntSize(300, 100))
+        viewModel.onHoveredOptionChange(BookmarkOption.SHARE)
+        assertTrue(viewModel.uiState.value.isMenuVisible)
+
+        viewModel.dismissActionsMenu()
+
+        var state = viewModel.uiState.value
+        assertNull(state.activeMenuBookmark)
+        assertNull(state.activeCardOffset)
+        assertNull(state.activeCardSize)
+        assertNull(state.touchPositionInWindow)
+        assertNull(state.hoveredOption)
+        assertFalse(state.isMenuVisible)
+
+        // Test onLongPressRelease
+        viewModel.onLongPressStart(bookmark1, Offset(100f, 200f), Offset(50f, 150f), IntSize(300, 100))
+        viewModel.onLongPressRelease()
+
+        state = viewModel.uiState.value
+        assertNull(state.activeMenuBookmark)
+        assertFalse(state.isMenuVisible)
+    }
+
+    @Test
+    fun `openDeleteDialog and dismissDeleteDialog control delete confirmation state`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.onLongPressStart(bookmark1, Offset(100f, 200f), Offset(50f, 150f), IntSize(300, 100))
+        viewModel.openDeleteDialog(bookmark1)
+
+        val state = viewModel.uiState.value
+        assertEquals(bookmark1, state.bookmarkToDelete)
+        assertNull(state.activeMenuBookmark) // Closes active long-press overlay
+
+        viewModel.dismissDeleteDialog()
+        assertNull(viewModel.uiState.value.bookmarkToDelete)
+    }
+
+    @Test
+    fun `togglePin delegates to bookmarkRepository togglePin`() = runTest(testDispatcher) {
+        viewModel.togglePin("bm_1")
+
+        coVerify(exactly = 1) { bookmarkRepository.togglePin("bm_1") }
+    }
+
+    @Test
+    fun `deleteBookmark delegates to bookmarkRepository and dismisses dialog`() = runTest(testDispatcher) {
+        val collectJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        viewModel.openDeleteDialog(bookmark1)
+        assertEquals(bookmark1, viewModel.uiState.value.bookmarkToDelete)
+
+        viewModel.deleteBookmark("bm_1")
+
+        coVerify(exactly = 1) { bookmarkRepository.deleteBookmark("bm_1") }
+        assertNull(viewModel.uiState.value.bookmarkToDelete)
     }
 }

@@ -9,6 +9,25 @@ import com.madruga665.bookmarks.data.local.CollectionEntity
 
 object ShareUtils {
 
+    fun shareBookmark(context: Context, bookmark: BookmarkEntity) {
+        val displayTitle = BookmarkDisplayUtils.getDisplayTitle(bookmark.title, bookmark.url)
+        val textToShare = "$displayTitle\n${bookmark.url}"
+
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, textToShare)
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, context.getString(R.string.bookmark_share_chooser_title)).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        try {
+            context.startActivity(shareIntent)
+        } catch (e: Exception) {
+            Toast.makeText(context, R.string.bookmark_share_error, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     fun shareBookmark(
         context: Context,
         title: String?,

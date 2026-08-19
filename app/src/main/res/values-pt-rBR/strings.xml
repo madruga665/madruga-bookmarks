@@ -141,6 +141,19 @@
     <string name="bookmark_toast_metadata_refresh_failed">Falha ao atualizar metadados</string>
     <string name="bookmark_toast_metadata_updated">Metadados atualizados!</string>
 
+    <!-- Bookmark Actions Menu -->
+    <string name="bookmark_action_open">Abrir</string>
+    <string name="bookmark_action_pin">Fixar</string>
+    <string name="bookmark_action_unpin">Desafixar</string>
+    <string name="bookmark_action_share">Compartilhar</string>
+    <string name="bookmark_action_delete">Excluir</string>
+    <string name="bookmark_toast_pinned">Link fixado com sucesso</string>
+    <string name="bookmark_toast_unpinned">Link desafixado</string>
+    <string name="bookmark_toast_deleted">Link excluído com sucesso</string>
+    <string name="bookmark_delete_confirm_title">Excluir link?</string>
+    <string name="bookmark_delete_confirm_msg">Tem certeza de que deseja excluir este link permanentemente?</string>
+    <string name="bookmark_toast_invalid_url">URL inválida</string>
+
     <!-- Settings -->
     <string name="section_preferences">PREFERÊNCIAS</string>
     <string name="pref_theme_title">Tema</string>

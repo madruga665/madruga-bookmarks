@@ -1,7 +1,10 @@
 package com.madruga665.bookmarks.ui.search
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.IntSize
 import com.madruga665.bookmarks.data.local.BookmarkEntity
 import com.madruga665.bookmarks.data.local.CollectionEntity
+import com.madruga665.bookmarks.ui.components.BookmarkOption
 import com.madruga665.bookmarks.ui.utils.TagItem
 
 data class LibraryStats(
@@ -20,8 +23,17 @@ data class SearchUiState(
     val recentlySavedBookmarks: List<BookmarkEntity> = emptyList(),
     val searchResults: List<BookmarkEntity> = emptyList(),
     val collectionsMap: Map<String, CollectionEntity> = emptyMap(),
-    val userMessage: String? = null
+    val userMessage: String? = null,
+    val activeMenuBookmark: BookmarkEntity? = null,
+    val activeCardOffset: Offset? = null,
+    val activeCardSize: IntSize? = null,
+    val touchPositionInWindow: Offset? = null,
+    val hoveredOption: BookmarkOption? = null,
+    val bookmarkToDelete: BookmarkEntity? = null
 ) {
+    val isMenuVisible: Boolean
+        get() = activeMenuBookmark != null && activeCardOffset != null && activeCardSize != null
+
     val isSearching: Boolean
         get() = searchQuery.isNotBlank() || selectedTags.isNotEmpty()
 

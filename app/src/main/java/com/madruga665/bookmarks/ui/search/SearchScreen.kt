@@ -41,7 +41,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.IntSize
 import com.madruga665.bookmarks.R
+import com.madruga665.bookmarks.data.local.BookmarkEntity
+import com.madruga665.bookmarks.ui.components.BookmarkActionsOverlay
+import com.madruga665.bookmarks.ui.components.BookmarkOption
+import com.madruga665.bookmarks.ui.components.DeleteConfirmationDialog
 import com.madruga665.bookmarks.ui.components.NeobrutalistButton
 import com.madruga665.bookmarks.ui.components.NeobrutalistTagChip
 import com.madruga665.bookmarks.ui.search.components.RecentlySavedSection
@@ -66,6 +72,13 @@ fun SearchScreen(
     onBookmarkClick: (String) -> Unit,
     onToggleTagFilter: (String) -> Unit = {},
     onClearTagFilters: () -> Unit = {},
+    onBookmarkLongPressStart: (BookmarkEntity, Offset, Offset, IntSize) -> Unit = { _, _, _, _ -> },
+    onBookmarkLongPressDrag: (Offset) -> Unit = {},
+    onBookmarkLongPressRelease: () -> Unit = {},
+    onBookmarkHoveredOptionChange: (BookmarkOption?) -> Unit = {},
+    onDismissBookmarkActionsMenu: () -> Unit = {},
+    onDismissDeleteBookmarkDialog: () -> Unit = {},
+    onConfirmDeleteBookmark: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -174,6 +187,7 @@ fun SearchScreen(
 
                 // Cancel Button
                 NeobrutalistButton(
+                    text = stringResource(R.string.search_cancel),
                     onClick = onCancelClick,
                     shape = RoundedCornerShape(12.dp),
                     borderWidth = 2.dp,
@@ -182,16 +196,7 @@ fun SearchScreen(
                     modifier = Modifier
                         .height(48.dp)
                         .testTag("tag_search_cancel_button")
-                ) {
-                    Text(
-                        text = stringResource(R.string.search_cancel),
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = NeobrutalismTheme.colors.onSurface
-                        )
-                    )
-                }
+                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -229,6 +234,9 @@ fun SearchScreen(
                             bookmarks = uiState.recentlySavedBookmarks,
                             collectionsMap = uiState.collectionsMap,
                             onBookmarkClick = onBookmarkClick,
+                            onLongPressStart = onBookmarkLongPressStart,
+                            onLongPressDrag = onBookmarkLongPressDrag,
+                            onLongPressRelease = onBookmarkLongPressRelease,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -267,11 +275,32 @@ fun SearchScreen(
                         searchResults = uiState.searchResults,
                         collectionsMap = uiState.collectionsMap,
                         onBookmarkClick = onBookmarkClick,
+                        onLongPressStart = onBookmarkLongPressStart,
+                        onLongPressDrag = onBookmarkLongPressDrag,
+                        onLongPressRelease = onBookmarkLongPressRelease,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
             }
         }
+
+        // Floating Bookmark Actions Menu Overlay
+        BookmarkActionsOverlay(
+            bookmark = uiState.activeMenuBookmark,
+            cardOffset = uiState.activeCardOffset,
+            cardSize = uiState.activeCardSize,
+            touchPositionInWindow = uiState.touchPositionInWindow,
+            onHoveredOptionChange = onBookmarkHoveredOptionChange
+        )
+
+        // Delete Confirmation Dialog
+        DeleteConfirmationDialog(
+            isVisible = uiState.bookmarkToDelete != null,
+            onConfirm = {
+                uiState.bookmarkToDelete?.let { onConfirmDeleteBookmark(it.id) }
+            },
+            onDismiss = onDismissDeleteBookmarkDialog
+        )
     }
 }
 
