@@ -16,6 +16,7 @@ data class BookmarkActionsOverlayState(
     val cardOffset: Offset? = null,
     val cardSize: IntSize? = null,
     val touchPositionInWindow: Offset? = null,
+    val dragPositionInWindow: Offset? = null,
     val hoveredOption: BookmarkOption? = null,
     val bookmarkToDelete: BookmarkEntity? = null
 ) {

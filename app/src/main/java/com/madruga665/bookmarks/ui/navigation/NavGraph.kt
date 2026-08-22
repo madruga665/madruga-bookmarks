@@ -145,7 +145,16 @@ fun BookmarksNavGraph(
                 onBookmarkHoveredOptionChange = searchViewModel::onHoveredOptionChange,
                 onDismissBookmarkActionsMenu = searchViewModel::dismissActionsMenu,
                 onDismissDeleteBookmarkDialog = searchViewModel::dismissDeleteDialog,
-                onConfirmDeleteBookmark = searchViewModel::deleteBookmark
+                onConfirmDeleteBookmark = searchViewModel::deleteBookmark,
+                onBookmarkSelectAction = { bookmark, option ->
+                    when (option) {
+                        BookmarkOption.OPEN -> LinkOpener.openUrl(context, bookmark.url)
+                        BookmarkOption.PIN -> searchViewModel.togglePin(bookmark.id)
+                        BookmarkOption.SHARE -> ShareUtils.shareBookmark(context, bookmark)
+                        BookmarkOption.DELETE -> searchViewModel.openDeleteDialog(bookmark)
+                    }
+                    searchViewModel.dismissActionsMenu()
+                }
             )
         }
 
@@ -228,7 +237,16 @@ fun BookmarksNavGraph(
                 onBookmarkHoveredOptionChange = viewModel::onHoveredOptionChange,
                 onDismissBookmarkActionsMenu = viewModel::dismissActionsMenu,
                 onDismissDeleteBookmarkDialog = viewModel::dismissDeleteDialog,
-                onConfirmDeleteBookmark = viewModel::deleteBookmark
+                onConfirmDeleteBookmark = viewModel::deleteBookmark,
+                onBookmarkSelectAction = { bookmark, option ->
+                    when (option) {
+                        BookmarkOption.OPEN -> LinkOpener.openUrl(context, bookmark.url)
+                        BookmarkOption.PIN -> viewModel.togglePin(bookmark.id)
+                        BookmarkOption.SHARE -> ShareUtils.shareBookmark(context, bookmark)
+                        BookmarkOption.DELETE -> viewModel.openDeleteDialog(bookmark)
+                    }
+                    viewModel.dismissActionsMenu()
+                }
             )
 
             SaveBookmarkBottomSheet(

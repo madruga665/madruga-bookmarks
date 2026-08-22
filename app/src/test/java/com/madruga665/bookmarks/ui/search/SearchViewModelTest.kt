@@ -604,7 +604,8 @@ class SearchViewModelTest {
         viewModel.onLongPressDrag(newTouchOffset)
 
         val state = viewModel.uiState.value
-        assertEquals(newTouchOffset, state.touchPositionInWindow)
+        assertEquals(Offset(100f, 200f), state.touchPositionInWindow)
+        assertEquals(newTouchOffset, state.dragPositionInWindow)
     }
 
     @Test
@@ -645,7 +646,16 @@ class SearchViewModelTest {
         assertNull(state.hoveredOption)
         assertFalse(state.isMenuVisible)
 
-        // Test onLongPressRelease
+        // Test onLongPressRelease with selection
+        viewModel.onLongPressStart(bookmark1, Offset(100f, 200f), Offset(50f, 150f), IntSize(300, 100))
+        viewModel.onHoveredOptionChange(BookmarkOption.OPEN)
+        viewModel.onLongPressRelease()
+
+        state = viewModel.uiState.value
+        assertNull(state.activeMenuBookmark)
+        assertFalse(state.isMenuVisible)
+
+        // Test onLongPressRelease without selection (finger lifted outside)
         viewModel.onLongPressStart(bookmark1, Offset(100f, 200f), Offset(50f, 150f), IntSize(300, 100))
         viewModel.onLongPressRelease()
 

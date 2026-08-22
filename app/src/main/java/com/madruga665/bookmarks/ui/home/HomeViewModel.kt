@@ -50,6 +50,7 @@ class HomeViewModel @Inject constructor(
             activeCardOffset = null,
             activeCardSize = null,
             touchPositionInWindow = null,
+            dragPositionInWindow = null,
             hoveredOption = null
         )
     }
@@ -66,14 +67,52 @@ class HomeViewModel @Inject constructor(
             activeCardOffset = cardOffset,
             activeCardSize = cardSize,
             touchPositionInWindow = touchInWindow,
+            dragPositionInWindow = touchInWindow,
             hoveredOption = null
         )
     }
 
-    fun onLongPressDrag(touchInWindow: androidx.compose.ui.geometry.Offset) {
+    fun onLongPressDrag(
+        touchInWindow: androidx.compose.ui.geometry.Offset,
+        screenWidth: Float = 1080f,
+        screenHeight: Float = 2400f,
+        density: Float = 3.0f
+    ) {
         val current = _uiState.value as? HomeScreenUiState.Success ?: return
         if (current.activeMenuCollection != null) {
-            _uiState.value = current.copy(touchPositionInWindow = touchInWindow)
+            val anchor = current.touchPositionInWindow ?: touchInWindow
+            val radius = 100f * density
+            val (startAngle, sweepAngle) = com.madruga665.bookmarks.ui.components.ArcGeometryCalculator.calculateSector(
+                anchor = anchor,
+                screenWidth = screenWidth,
+                screenHeight = screenHeight,
+                radius = radius
+            )
+            val itemPositions = com.madruga665.bookmarks.ui.components.ArcGeometryCalculator.calculateItemPositions(
+                anchor = anchor,
+                itemCount = 3,
+                radius = radius,
+                startAngle = startAngle,
+                sweepAngle = sweepAngle
+            )
+            val hoveredIndex = com.madruga665.bookmarks.ui.components.ArcGeometryCalculator.findHoveredItemIndex(
+                touchPosition = touchInWindow,
+                anchor = anchor,
+                itemPositions = itemPositions,
+                buttonRadius = 26f * density,
+                hitPadding = 54f * density
+            )
+            val options = listOf(
+                com.madruga665.bookmarks.ui.components.CollectionOption.EDIT,
+                com.madruga665.bookmarks.ui.components.CollectionOption.SHARE,
+                com.madruga665.bookmarks.ui.components.CollectionOption.DELETE
+            )
+            val hoveredOption = hoveredIndex?.let { options.getOrNull(it) }
+
+            _uiState.value = current.copy(
+                dragPositionInWindow = touchInWindow,
+                hoveredOption = hoveredOption
+            )
         }
     }
 
@@ -94,6 +133,7 @@ class HomeViewModel @Inject constructor(
             activeCardOffset = null,
             activeCardSize = null,
             touchPositionInWindow = null,
+            dragPositionInWindow = null,
             hoveredOption = null
         )
 
@@ -101,7 +141,7 @@ class HomeViewModel @Inject constructor(
             com.madruga665.bookmarks.ui.components.CollectionOption.EDIT -> openEditDialog(targetCollection)
             com.madruga665.bookmarks.ui.components.CollectionOption.SHARE -> onShareRequested(targetCollection)
             com.madruga665.bookmarks.ui.components.CollectionOption.DELETE -> openDeleteDialog(targetCollection)
-            null -> { /* Simply close menu */ }
+            null -> { /* Finger released outside: menu closes */ }
         }
     }
 

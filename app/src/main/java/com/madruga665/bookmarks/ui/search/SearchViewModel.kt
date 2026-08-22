@@ -8,6 +8,7 @@ import com.madruga665.bookmarks.data.local.BookmarkEntity
 import com.madruga665.bookmarks.data.local.CollectionEntity
 import com.madruga665.bookmarks.data.repository.BookmarkRepository
 import com.madruga665.bookmarks.data.repository.CollectionRepository
+import com.madruga665.bookmarks.ui.components.ArcGeometryCalculator
 import com.madruga665.bookmarks.ui.components.BookmarkActionsOverlayState
 import com.madruga665.bookmarks.ui.components.BookmarkOption
 import com.madruga665.bookmarks.ui.utils.TagItem
@@ -125,6 +126,7 @@ class SearchViewModel @Inject constructor(
             activeCardOffset = overlay.cardOffset,
             activeCardSize = overlay.cardSize,
             touchPositionInWindow = overlay.touchPositionInWindow,
+            dragPositionInWindow = overlay.dragPositionInWindow,
             hoveredOption = overlay.hoveredOption,
             bookmarkToDelete = overlay.bookmarkToDelete
         )
@@ -166,15 +168,54 @@ class SearchViewModel @Inject constructor(
                 cardOffset = cardOffset,
                 cardSize = cardSize,
                 touchPositionInWindow = touchPosition,
+                dragPositionInWindow = touchPosition,
                 hoveredOption = null
             )
         }
     }
 
-    fun onLongPressDrag(touchPosition: Offset) {
+    fun onLongPressDrag(
+        touchPosition: Offset,
+        screenWidth: Float = 1080f,
+        screenHeight: Float = 2400f,
+        density: Float = 3.0f
+    ) {
         _overlayState.update { current ->
             if (current.activeBookmark != null) {
-                current.copy(touchPositionInWindow = touchPosition)
+                val anchor = current.touchPositionInWindow ?: touchPosition
+                val radius = 100f * density
+                val (startAngle, sweepAngle) = ArcGeometryCalculator.calculateSector(
+                    anchor = anchor,
+                    screenWidth = screenWidth,
+                    screenHeight = screenHeight,
+                    radius = radius
+                )
+                val itemPositions = ArcGeometryCalculator.calculateItemPositions(
+                    anchor = anchor,
+                    itemCount = 4,
+                    radius = radius,
+                    startAngle = startAngle,
+                    sweepAngle = sweepAngle
+                )
+                val hoveredIndex = ArcGeometryCalculator.findHoveredItemIndex(
+                    touchPosition = touchPosition,
+                    anchor = anchor,
+                    itemPositions = itemPositions,
+                    buttonRadius = 26f * density,
+                    hitPadding = 54f * density
+                )
+                val options = listOf(
+                    BookmarkOption.OPEN,
+                    BookmarkOption.PIN,
+                    BookmarkOption.SHARE,
+                    BookmarkOption.DELETE
+                )
+                val hoveredOption = hoveredIndex?.let { options.getOrNull(it) }
+
+                current.copy(
+                    dragPositionInWindow = touchPosition,
+                    hoveredOption = hoveredOption
+                )
             } else {
                 current
             }
@@ -198,6 +239,7 @@ class SearchViewModel @Inject constructor(
                 cardOffset = null,
                 cardSize = null,
                 touchPositionInWindow = null,
+                dragPositionInWindow = null,
                 hoveredOption = null
             )
         }
@@ -214,6 +256,7 @@ class SearchViewModel @Inject constructor(
                 cardOffset = null,
                 cardSize = null,
                 touchPositionInWindow = null,
+                dragPositionInWindow = null,
                 hoveredOption = null
             )
         }
