@@ -28,6 +28,7 @@ data class SearchUiState(
     val activeCardOffset: Offset? = null,
     val activeCardSize: IntSize? = null,
     val touchPositionInWindow: Offset? = null,
+    val dragPositionInWindow: Offset? = null,
     val hoveredOption: BookmarkOption? = null,
     val bookmarkToDelete: BookmarkEntity? = null
 ) {

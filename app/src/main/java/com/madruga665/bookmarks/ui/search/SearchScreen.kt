@@ -80,6 +80,7 @@ fun SearchScreen(
     onDismissBookmarkActionsMenu: () -> Unit = {},
     onDismissDeleteBookmarkDialog: () -> Unit = {},
     onConfirmDeleteBookmark: (String) -> Unit = {},
+    onBookmarkSelectAction: ((BookmarkEntity, BookmarkOption) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -292,7 +293,14 @@ fun SearchScreen(
             cardOffset = uiState.activeCardOffset,
             cardSize = uiState.activeCardSize,
             touchPositionInWindow = uiState.touchPositionInWindow,
-            onHoveredOptionChange = onBookmarkHoveredOptionChange
+            dragPositionInWindow = uiState.dragPositionInWindow,
+            hoveredOption = uiState.hoveredOption,
+            onHoveredOptionChange = onBookmarkHoveredOptionChange,
+            onSelectItem = { option ->
+                val bookmark = uiState.activeMenuBookmark ?: return@BookmarkActionsOverlay
+                onBookmarkSelectAction?.invoke(bookmark, option)
+            },
+            onDismiss = onDismissBookmarkActionsMenu
         )
 
         // Delete Confirmation Dialog

@@ -19,6 +19,7 @@ sealed interface HomeScreenUiState {
         val collectionToEdit: CollectionEntity? = null,
         val collectionToDelete: CollectionEntity? = null,
         val touchPositionInWindow: Offset? = null,
+        val dragPositionInWindow: Offset? = null,
         val hoveredOption: CollectionOption? = null
     ) : HomeScreenUiState
 

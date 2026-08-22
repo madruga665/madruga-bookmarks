@@ -167,14 +167,24 @@ fun HomeScreen(
             }
         }
 
-        // Long-Press Actions Menu Dimming Backdrop & Highlighted Active Card Layer
         if (successState != null) {
             CollectionActionsOverlay(
                 collection = successState.activeMenuCollection,
                 cardOffset = successState.activeCardOffset,
                 cardSize = successState.activeCardSize,
                 touchPositionInWindow = successState.touchPositionInWindow,
-                onHoveredOptionChange = onHoveredOptionChange
+                dragPositionInWindow = successState.dragPositionInWindow,
+                hoveredOption = successState.hoveredOption,
+                onHoveredOptionChange = onHoveredOptionChange,
+                onSelectItem = { option ->
+                    val collection = successState.activeMenuCollection ?: return@CollectionActionsOverlay
+                    when (option) {
+                        CollectionOption.EDIT -> onEditCollectionClick(collection)
+                        CollectionOption.SHARE -> onShareCollectionClick(collection)
+                        CollectionOption.DELETE -> onDeleteCollectionClick(collection)
+                    }
+                },
+                onDismiss = onDismissActionsMenu
             )
 
             // Edit Collection Dialog Modal

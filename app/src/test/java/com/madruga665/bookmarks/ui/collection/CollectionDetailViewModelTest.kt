@@ -6,6 +6,7 @@ import com.madruga665.bookmarks.data.local.BookmarkEntity
 import com.madruga665.bookmarks.data.local.CollectionEntity
 import com.madruga665.bookmarks.data.repository.BookmarkRepository
 import com.madruga665.bookmarks.data.repository.CollectionRepository
+import com.madruga665.bookmarks.ui.components.ArcGeometryCalculator
 import com.madruga665.bookmarks.ui.components.BookmarkOption
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -193,7 +194,44 @@ class CollectionDetailViewModelTest {
         viewModel.onLongPressDrag(Offset(120f, 230f))
 
         val state = viewModel.uiState.value
-        assertEquals(Offset(120f, 230f), state.touchPositionInWindow)
+        assertEquals(Offset(100f, 200f), state.touchPositionInWindow)
+        assertEquals(Offset(120f, 230f), state.dragPositionInWindow)
+
+        collectJob.cancel()
+    }
+
+    @Test
+    fun onLongPressDrag_whenDraggingOverOption_selectsAndExecutesOnRelease() = runTest {
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        val bookmark = sampleBookmarks.first()
+        val anchor = Offset(100f, 200f)
+        viewModel.onLongPressStart(
+            bookmark = bookmark,
+            touchPosition = anchor,
+            cardOffset = Offset(50f, 150f),
+            cardSize = IntSize(300, 200)
+        )
+
+        // Calculate first item position
+        val sector = ArcGeometryCalculator.calculateSector(anchor, 1080f, 2400f, 300f)
+        val positions = ArcGeometryCalculator.calculateItemPositions(anchor, 4, 300f, sector.first, sector.second)
+        val targetPos = anchor + positions.first().offset
+
+        viewModel.onLongPressDrag(targetPos)
+
+        // Hovered option should be OPEN
+        assertEquals(BookmarkOption.OPEN, viewModel.uiState.value.hoveredOption)
+
+        var selectedAction: BookmarkOption? = null
+        viewModel.onLongPressRelease { _, option ->
+            selectedAction = option
+        }
+
+        assertEquals(BookmarkOption.OPEN, selectedAction)
+        assertNull(viewModel.uiState.value.activeMenuBookmark)
 
         collectJob.cancel()
     }
@@ -238,6 +276,7 @@ class CollectionDetailViewModelTest {
         assertNull(state.activeCardOffset)
         assertNull(state.activeCardSize)
         assertNull(state.touchPositionInWindow)
+        assertNull(state.dragPositionInWindow)
         assertNull(state.hoveredOption)
 
         collectJob.cancel()
@@ -269,6 +308,31 @@ class CollectionDetailViewModelTest {
         assertEquals(bookmark, selectedBookmark)
         assertEquals(BookmarkOption.PIN, selectedOption)
         assertNull(viewModel.uiState.value.activeMenuBookmark)
+
+        collectJob.cancel()
+    }
+
+    @Test
+    fun onLongPressRelease_withoutSelection_resetsStateAndClosesMenu() = runTest {
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect()
+        }
+
+        val bookmark = sampleBookmarks.first()
+        viewModel.onLongPressStart(
+            bookmark = bookmark,
+            touchPosition = Offset(100f, 200f),
+            cardOffset = Offset(50f, 150f),
+            cardSize = IntSize(300, 200)
+        )
+
+        var actionCalled = false
+        viewModel.onLongPressRelease { _, _ -> actionCalled = true }
+
+        assertFalse(actionCalled)
+        assertNull(viewModel.uiState.value.activeMenuBookmark)
+        assertNull(viewModel.uiState.value.touchPositionInWindow)
+        assertNull(viewModel.uiState.value.dragPositionInWindow)
 
         collectJob.cancel()
     }

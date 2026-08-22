@@ -49,6 +49,7 @@ fun CollectionDetailScreen(
     onDismissBookmarkActionsMenu: () -> Unit = {},
     onDismissDeleteBookmarkDialog: () -> Unit = {},
     onConfirmDeleteBookmark: (String) -> Unit = {},
+    onBookmarkSelectAction: ((BookmarkEntity, BookmarkOption) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val title = uiState.collection?.name ?: ""
@@ -180,7 +181,14 @@ fun CollectionDetailScreen(
             cardOffset = uiState.activeCardOffset,
             cardSize = uiState.activeCardSize,
             touchPositionInWindow = uiState.touchPositionInWindow,
-            onHoveredOptionChange = onBookmarkHoveredOptionChange
+            dragPositionInWindow = uiState.dragPositionInWindow,
+            hoveredOption = uiState.hoveredOption,
+            onHoveredOptionChange = onBookmarkHoveredOptionChange,
+            onSelectItem = { option ->
+                val bookmark = uiState.activeMenuBookmark ?: return@BookmarkActionsOverlay
+                onBookmarkSelectAction?.invoke(bookmark, option)
+            },
+            onDismiss = onDismissBookmarkActionsMenu
         )
 
         DeleteConfirmationDialog(
