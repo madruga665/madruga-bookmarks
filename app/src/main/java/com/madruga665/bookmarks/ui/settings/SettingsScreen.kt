@@ -49,6 +49,7 @@ import com.madruga665.bookmarks.ui.settings.components.PreferenceItemCard
 import com.madruga665.bookmarks.ui.settings.components.ThemeSelectionDialog
 import com.madruga665.bookmarks.ui.settings.components.UsageHeroCard
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
+import com.madruga665.bookmarks.ui.theme.neobrutalistGridBackground
 import com.madruga665.bookmarks.ui.theme.neobrutalistShadow
 
 @Composable
@@ -70,6 +71,7 @@ fun SettingsScreen(
         modifier = modifier
             .fillMaxSize()
             .background(NeobrutalismTheme.colors.background)
+            .neobrutalistGridBackground(NeobrutalismTheme.colors.gridLine)
     ) {
         Column(
             modifier = Modifier

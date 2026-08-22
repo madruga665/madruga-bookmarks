@@ -56,6 +56,7 @@ import com.madruga665.bookmarks.ui.search.components.SearchIdlePrompt
 import com.madruga665.bookmarks.ui.search.components.SearchResultsList
 import com.madruga665.bookmarks.ui.search.components.YourLibraryCard
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
+import com.madruga665.bookmarks.ui.theme.neobrutalistGridBackground
 import com.madruga665.bookmarks.ui.theme.neobrutalistShadow
 import com.madruga665.bookmarks.ui.utils.TagItem
 
@@ -85,6 +86,7 @@ fun SearchScreen(
         modifier = modifier
             .fillMaxSize()
             .background(NeobrutalismTheme.colors.background)
+            .neobrutalistGridBackground(NeobrutalismTheme.colors.gridLine)
             .statusBarsPadding()
             .testTag("tag_search_screen")
     ) {

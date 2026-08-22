@@ -12,6 +12,7 @@ val LightOnSurface = Color(0xFF000000)
 val LightSubtext = Color(0xFF555555)
 val LightBorder = Color(0xFF000000)
 val LightShadow = Color(0xFF000000)
+val LightGridLine = Color(0xFFE2E2E2)
 
 val LightAccentYellow = Color(0xFFFFD600) // #FFD600 / #FFC107
 val LightAccentPurple = Color(0xFF7C5CFF) // #7C5CFF
@@ -27,6 +28,7 @@ val MochaText = Color(0xFFCDD6F4)      // Primary text
 val MochaSubtext0 = Color(0xFFA6ADC8)  // Secondary text
 val MochaOverlay0 = Color(0xFF6C7086)
 val MochaCrust = Color(0xFF11111B)     // Dark stroke / shadow outline
+val MochaGridLine = Color(0xFF28283D)
 
 val MochaYellow = Color(0xFFF9E2AF)    // Catppuccin Yellow accent
 val MochaMauve = Color(0xFFCBA6F7)     // Catppuccin Mauve/Purple accent
@@ -45,7 +47,8 @@ data class NeobrutalismColors(
     val accentYellow: Color,
     val accentPurple: Color,
     val accentOrange: Color,
-    val accentBlue: Color
+    val accentBlue: Color,
+    val gridLine: Color
 )
 
 val LightNeobrutalismColors = NeobrutalismColors(
@@ -58,7 +61,8 @@ val LightNeobrutalismColors = NeobrutalismColors(
     accentYellow = LightAccentYellow,
     accentPurple = LightAccentPurple,
     accentOrange = LightAccentOrange,
-    accentBlue = LightAccentBlue
+    accentBlue = LightAccentBlue,
+    gridLine = LightGridLine
 )
 
 val MochaDarkNeobrutalismColors = NeobrutalismColors(
@@ -71,5 +75,6 @@ val MochaDarkNeobrutalismColors = NeobrutalismColors(
     accentYellow = MochaYellow,
     accentPurple = MochaMauve,
     accentOrange = MochaPeach,
-    accentBlue = MochaBlue
+    accentBlue = MochaBlue,
+    gridLine = MochaGridLine
 )
