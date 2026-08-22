@@ -34,6 +34,7 @@ import com.madruga665.bookmarks.ui.bookmark.components.BookmarkUrlCard
 import com.madruga665.bookmarks.ui.components.DeleteConfirmationDialog
 import com.madruga665.bookmarks.ui.bookmark.components.MoveCollectionBottomSheet
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
+import com.madruga665.bookmarks.ui.theme.neobrutalistGridBackground
 
 @Composable
 fun BookmarkDetailScreen(
@@ -81,6 +82,7 @@ fun BookmarkDetailScreen(
         modifier = modifier
             .fillMaxSize()
             .background(NeobrutalismTheme.colors.background)
+            .neobrutalistGridBackground(NeobrutalismTheme.colors.gridLine)
     ) {
         when {
             uiState.isLoading -> {

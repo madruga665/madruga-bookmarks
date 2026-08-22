@@ -34,6 +34,7 @@ class SearchThemeAndLocalizationTest {
         assertEquals(LightBorder, colors.border)
         assertEquals(LightShadow, colors.shadow)
         assertEquals(LightAccentYellow, colors.accentYellow)
+        assertEquals(com.madruga665.bookmarks.ui.theme.LightGridLine, colors.gridLine)
     }
 
     @Test
@@ -47,6 +48,7 @@ class SearchThemeAndLocalizationTest {
         assertEquals(MochaCrust, colors.border)
         assertEquals(MochaCrust, colors.shadow)
         assertEquals(MochaYellow, colors.accentYellow)
+        assertEquals(com.madruga665.bookmarks.ui.theme.MochaGridLine, colors.gridLine)
     }
 
     @Test

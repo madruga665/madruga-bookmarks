@@ -40,6 +40,7 @@ import com.madruga665.bookmarks.ui.home.components.QuickSaveBar
 import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkBottomSheet
 import com.madruga665.bookmarks.ui.savemodal.SaveBookmarkViewModel
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
+import com.madruga665.bookmarks.ui.theme.neobrutalistGridBackground
 
 @Composable
 fun HomeScreen(
@@ -74,11 +75,15 @@ fun HomeScreen(
 
     val successState = uiState as? HomeScreenUiState.Success
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(NeobrutalismTheme.colors.background)
+            .neobrutalistGridBackground(NeobrutalismTheme.colors.gridLine)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(NeobrutalismTheme.colors.background)
                 .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState())
         ) {

@@ -32,6 +32,7 @@ import com.madruga665.bookmarks.ui.components.BookmarkOption
 import com.madruga665.bookmarks.ui.components.DeleteConfirmationDialog
 import com.madruga665.bookmarks.ui.components.NeobrutalistBookmarkCard
 import com.madruga665.bookmarks.ui.theme.NeobrutalismTheme
+import com.madruga665.bookmarks.ui.theme.neobrutalistGridBackground
 
 @Composable
 fun CollectionDetailScreen(
@@ -58,11 +59,15 @@ fun CollectionDetailScreen(
     val pinned = uiState.bookmarks.filter { it.isPinned }
     val allOthers = uiState.bookmarks.filter { !it.isPinned }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(NeobrutalismTheme.colors.background)
+            .neobrutalistGridBackground(NeobrutalismTheme.colors.gridLine)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(NeobrutalismTheme.colors.background)
                 .padding(horizontal = 20.dp)
         ) {
             CollectionHeader(
